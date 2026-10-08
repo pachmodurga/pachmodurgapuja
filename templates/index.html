@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACHMO DURGA PUJA FUND & EXPENSE PORTAL 2026</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-section {
+            background: linear-gradient(135deg, rgba(142, 23, 42, 0.88), rgba(80, 10, 20, 0.85)), 
+                        url('https://images.unsplash.com/photo-1603565816030-6b3892e2fea2?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+            color: white;
+            padding: 50px 20px;
+            border-bottom: 6px solid #ffc107;
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+        .portal-main-title {
+            font-size: 2.6rem;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+            background: linear-gradient(to right, #ffffff, #ffecb3, #ffe082);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-actions {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        .action-btn {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            border: 2px solid #ffc107;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        .action-btn:hover {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .full-report-btn {
+            background-color: #198754;
+            border: 2px solid #fff;
+        }
+        .full-report-btn:hover {
+            background-color: #157347;
+        }
+        .card-custom {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+            transition: transform 0.2s;
+        }
+        .card-custom:hover {
+            transform: translateY(-2px);
+        }
+        .category-badge {
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            padding: 8px 14px;
+        }
+        .category-badge:hover, .category-badge.active {
+            background-color: #0d6efd !important;
+            color: white !important;
+        }
+        .modal {
+            background: rgba(0, 0, 0, 0.6);
+        }
+        .pagination .page-link {
+            font-weight: bold;
+            color: #581845;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #581845;
+            border-color: #581845;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-section text-center">
+        <div class="header-actions">
+            {% if session.get('logged_in') %}
+                <a href="/logout" class="action-btn">
+                    <i class="fa fa-sign-out-alt"></i> लॉग आउट (Logout)
+                </a>
+            {% else %}
+                <a href="/login" class="action-btn">
+                    <i class="fa fa-sign-in-alt"></i> एडमिन लॉग इन (Login)
+                </a>
+            {% endif %}
+            <a href="/download_full_report" class="action-btn full-report-btn" target="_blank">
+                <i class="fa fa-file-pdf"></i> पूरी रिपोर्ट (Full Report)
+            </a>
+        </div>
+
+        <div class="container-fluid px-3">
+            <span class="badge bg-warning text-dark px-3 py-2 mb-3 fw-bold shadow" style="font-size: 1.1rem;">✨ LIVE PUBLIC AUDITED LEDGER 2026 ✨</span>
+            <h1 class="fw-bold text-uppercase portal-main-title">PACHMO DURGA PUJA FUND & EXPENSE PORTAL 2026</h1>
+            <h2 class="text-warning mt-2 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">( पचमो दुर्गा पूजा फंड और खर्च पोर्टल 2026 )</h2>
+            <p class="text-light mt-2 mb-1 fs-5">Sharadotsav 1432 / 2026 • <span class="badge bg-success fs-6">Real-Time Verified</span></p>
+            <h3 class="text-info mt-2 fw-bold" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">नबयुवक संघ जीवन दुर्गा उत्सव 2026</h3>
+            
+            {% if session.get('logged_in') %}
+                <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+                    <button class="btn btn-warning btn-lg fw-bold text-dark px-4 py-2.5 shadow" data-bs-toggle="modal" data-bs-target="#contribModal" style="font-size: 1.1rem;">
+                        <i class="fa fa-plus-circle"></i> चंदा देने वाला व्यक्ति जोड़ें
+                    </button>
+                    <button class="btn btn-danger btn-lg fw-bold text-white px-4 py-2.5 shadow" data-bs-toggle="modal" data-bs-target="#expenseModal" style="font-size: 1.1rem;">
+                        <i class="fa fa-plus-circle"></i> खर्च जोड़ें (Add Expense)
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container-fluid px-4 my-4">
+        
+        <div class="row g-4 mb-4">
+            <div class="col-xl-4 col-md-4">
+                <div class="card card-custom p-4 bg-white border-start border-success border-4">
+                    <h5 class="text-muted fw-bold">TOTAL COLLECTIONS ( कुल चंदा )</h5>
+                    <h1 class="fw-bold text-success mt-2">₹ {{ total_collection }}</h1>
+                    <span class="text-muted fs-6">{{ contributions|length }} Contributing Families / Donors</span>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-4">
+                <div class="card card-custom p-4 bg-white border-start border-danger border-4">
+                    <h5 class="text-muted fw-bold">TOTAL EXPENSES ( कुल खर्च )</h5>
+                    <h1 class="fw-bold text-danger mt-2">₹ {{ total_expenses }}</h1>
+                    <span class="text-muted fs-6">{{ expenses|length }} Festival Expenditures Logged</span>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-4">
+                <div class="card card-custom p-4 bg-white border-start border-primary border-4">
+                    <h5 class="text-muted fw-bold">AVAILABLE BALANCE ( उपलब्ध शेष )</h5>
+                    <h1 class="fw-bold text-primary mt-2">₹ {{ available_balance }}</h1>
+                    <span class="text-success fw-bold fs-6">Healthy Reserve in Surplus</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-custom p-4 bg-white mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-9">
+                    <h4 class="fw-bold text-dark">BUDGET UTILIZATION ( बजट उपयोग )</h4>
+                    <div class="progress mt-3 shadow-sm" style="height: 28px; border-radius: 10px;">
+                        <div class="progress-bar bg-info progress-bar-striped progress-bar-animated fw-bold fs-5" role="progressbar" style="width: {{ utilization_ratio }}%;" aria-valuenow="{{ utilization_ratio }}" aria-valuemin="0" aria-valuemax="100">{{ utilization_ratio }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center mt-3 mt-md-0">
+                    <h1 class="fw-bold text-info mb-0">{{ utilization_ratio }}%</h1>
+                    <span class="text-muted fs-6 fw-bold">Utilized</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- रजिस्टर मेंटेन फाइल (Register Maintain File Section) -->
+        <div class="card card-custom p-4 bg-white mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                <div>
+                    <h2 class="fw-bold text-dark mb-0"><i class="fa fa-file-alt text-secondary"></i> रजिस्टर मेंटेन फ़ाइलें (Official Scan Copies)</h2>
+                    <p class="text-muted mb-0 fs-5 mt-1">हस्ताक्षरित रिकॉर्ड और रजिस्टर स्कैन प्रतियाँ (PDF/Images)</p>
+                </div>
+                {% if session.get('logged_in') %}
+                    <form method="POST" action="/upload" enctype="multipart/form-data" class="d-flex gap-2">
+                        <input type="file" name="file" class="form-control form-control-lg" required>
+                        <button type="submit" class="btn btn-success btn-lg fw-bold px-4"><i class="fa fa-upload"></i> अपलोड करें</button>
+                    </form>
+                {% endif %}
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle table-bordered fs-5">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 10%;">#</th>
+                            <th style="width: 45%;">फ़ाइल का नाम (File Name)</th>
+                            <th style="width: 25%;">अपलोड की तारीख (Date)</th>
+                            <th style="width: 20%;">एक्शन (Actions)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for upload in uploads %}
+                        <tr>
+                            <td class="fw-bold">{{ loop.index }}</td>
+                            <td class="fw-bold text-dark fs-4">{{ upload.filename }}</td>
+                            <td class="text-muted">{{ upload.date }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="/uploads/{{ upload.filename }}" class="btn btn-outline-primary fw-bold px-3 py-2" target="_blank" title="Download">
+                                        <i class="fa fa-download"></i> देखें
+                                    </a>
+                                    {% if session.get('logged_in') %}
+                                        <button type="button" class="btn btn-danger fw-bold px-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteUploadModal{{ upload.id }}" title="Delete File">
+                                            <i class="fa fa-trash"></i> डिलीट
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4 fs-5">कोई फ़ाइल अपलोड नहीं की गई है।</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card card-custom p-4 bg-white mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                <div>
+                    <div class="d-flex align-items-center flex-wrap gap-3">
+                        <h2 class="fw-bold text-dark mb-0">DETAILED EXPENSES LEDGER</h2>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-dark fs-5 px-3 py-2">कुल प्रविष्टियाँ: {{ expenses|length }}</span>
+                            <span class="badge bg-danger fs-5 px-3 py-2">कुल खर्च: ₹ {{ total_expenses }}</span>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-0 fs-5 mt-1">खर्च का विस्तृत विवरण (Pratima, Mandap, Illumination, Bhog Seva, etc.)</p>
+                </div>
+                
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/download_expense_report" class="btn btn-outline-danger btn-lg fw-bold" target="_blank" title="Download Expense Report PDF">
+                        <i class="fa fa-file-pdf"></i> खर्च रिपोर्ट (PDF)
+                    </a>
+                    <form method="GET" action="/dashboard" class="d-flex" style="max-width: 320px; width: 100%;">
+                        <input type="text" name="search" class="form-control form-control-lg" placeholder="Search item, vendor..." value="{{ search_query }}">
+                        <button type="submit" class="btn btn-outline-primary ms-2 px-3"><i class="fa fa-search"></i></button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <a href="/dashboard?category=All Categories{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'All Categories' %}active{% endif %}">All Categories (सभी श्रेणियां)</a>
+                <a href="/dashboard?category=Idol & Pratima{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Idol & Pratima' %}active{% endif %}">Idol & Pratima (मूर्ति एवं प्रतिमा)</a>
+                <a href="/dashboard?category=Pandal & Decor{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Pandal & Decor' %}active{% endif %}">Pandal & Decor (पंडाल एवं सजावट)</a>
+                <a href="/dashboard?category=Lighting & Sound{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Lighting & Sound' %}active{% endif %}">Lighting & Sound (लाइटिंग एवं साउंड)</a>
+                <a href="/dashboard?category=Bhog & Prasad{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Bhog & Prasad' %}active{% endif %}">Bhog & Prasad (भोग एवं प्रसाद)</a>
+                <a href="/dashboard?category=Artists & Dhaki{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Artists & Dhaki' %}active{% endif %}">Artists & Dhaki (कलाकार एवं ढाकी)</a>
+                <a href="/dashboard?category=Logistics & Misc{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Logistics & Misc' %}active{% endif %}">Logistics & Misc (लॉजिस्टिक्स एवं अन्य)</a>
+                <a href="/dashboard?category=Other{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Other' %}active{% endif %}">Other (अन्य)</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle table-bordered fs-5">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 5%;">#</th>
+                            <th style="width: 25%;">विवरण (Title)</th>
+                            <th style="width: 20%;">श्रेणी (Category)</th>
+                            <th style="width: 15%;">विक्रेता (Vendor)</th>
+                            <th style="width: 15%;">तारीख (Date)</th>
+                            <th style="width: 10%;">राशि (Amount)</th>
+                            {% if session.get('logged_in') %}
+                                <th style="width: 10%;">एक्शन (Actions)</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exp in expenses %}
+                        <tr>
+                            <td class="fw-bold">{{ loop.index }}</td>
+                            <td class="fw-bold text-dark fs-4">{{ exp.title }}</td>
+                            <td><span class="badge bg-secondary fs-6">{{ exp.category }}</span></td>
+                            <td class="fw-semibold">{{ exp.vendor }}</td>
+                            <td class="text-muted">{{ exp.date }}</td>
+                            <td class="fw-bold text-danger fs-3">₹ {{ exp.amount }}</td>
+                            {% if session.get('logged_in') %}
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-warning fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editExpenseModal{{ exp.id }}" title="Edit">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteExpenseModal{{ exp.id }}" title="Delete">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            {% endif %}
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="{{ 7 if session.get('logged_in') else 6 }}" class="text-center text-muted py-4 fs-5">No expenditures found matching your filter or search.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card card-custom p-4 bg-white mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                <div>
+                    <div class="d-flex align-items-center flex-wrap gap-3">
+                        <h2 class="fw-bold text-dark mb-0"><i class="fa fa-hands-holding-child text-warning"></i> COMMUNITY CONTRIBUTIONS</h2>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-primary fs-5 px-3 py-2">कुल दाता: {{ contributions|length }} व्यक्ति</span>
+                            <span class="badge bg-success fs-5 px-3 py-2">कुल चंदा: ₹ {{ total_collection }}</span>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-0 fs-5 mt-1">चंदा विवरण - Heartfelt gratitude to every family supporting Maa Durga.</p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/download_contribution_report" class="btn btn-outline-success btn-lg fw-bold" target="_blank" title="Download Contribution Report PDF">
+                        <i class="fa fa-file-pdf"></i> चंदा रिपोर्ट (PDF)
+                    </a>
+                    <div class="d-flex" style="max-width: 280px; width: 100%;">
+                        <input type="text" id="donorSearchInput" class="form-control form-control-lg" placeholder="दाता का नाम खोजें..." onkeyup="filterDonorsTable()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped align-middle table-bordered fs-5" id="donorsTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 10%;">#</th>
+                            <th style="width: 40%;">दाता का नाम (Donor Name)</th>
+                            <th style="width: 25%;">तारीख (Date)</th>
+                            <th style="width: 15%;">योगदान राशि (Amount)</th>
+                            {% if session.get('logged_in') %}
+                                <th style="width: 10%;">एक्शन (Actions)</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set name_colors = ['text-primary', 'text-success', 'text-danger', 'text-warning', 'text-info', 'text-dark', 'text-secondary'] %}
+                        {% for c in contributions %}
+                        {% set color_class = name_colors[loop.index0 % name_colors|length] %}
+                        <tr class="donor-row" data-name="{{ c.name|lower }}">
+                            <td class="fw-bold donor-index">{{ loop.index }}</td>
+                            <td class="fw-bold fs-3 {{ color_class }}">{{ c.name }}</td>
+                            <td class="text-muted">{{ c.date }}</td>
+                            <td class="fw-bold text-success fs-3">₹ {{ c.amount }}</td>
+                            {% if session.get('logged_in') %}
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-primary fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editContribModal{{ c.id }}" title="Edit">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteContribModal{{ c.id }}" title="Delete">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            {% endif %}
+                        </tr>
+                        {% else %}
+                        <tr id="noDonorFoundRow">
+                            <td colspan="{{ 5 if session.get('logged_in') else 4 }}" class="text-center text-muted py-4 fs-5">No devotee records found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="Donors Page Navigation" class="mt-3">
+                <ul class="pagination justify-content-center" id="donorsPagination">
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <!-- Modals for Logged In Admin -->
+    {% if session.get('logged_in') %}
+        <!-- Upload Delete Modals -->
+        {% for upload in uploads %}
+        <div class="modal fade" id="deleteUploadModal{{ upload.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg border-danger border-3">
+                    <div class="modal-header bg-danger text-white">
+                        <h4 class="modal-title fw-bold"><i class="fa fa-exclamation-triangle"></i> फ़ाइल डिलीट करने की पुष्टि</h4>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body fs-5">
+                        <p class="fw-bold text-danger">क्या आप वाकई इस स्कैन फ़ाइल को हमेशा के लिए हटाना चाहते हैं?</p>
+                        <div class="p-3 bg-light border rounded mb-3">
+                            <strong>फ़ाइल का नाम:</strong> {{ upload.filename }}<br>
+                            <strong>अपलोड तारीख:</strong> {{ upload.date }}
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmDeleteUpload{{ upload.id }}" required onchange="document.getElementById('finalDeleteUploadBtn{{ upload.id }}').disabled = !this.checked;">
+                            <label class="form-check-label fw-bold fs-6 text-dark" for="confirmDeleteUpload{{ upload.id }}">
+                                हाँ, मैं इस फ़ाइल को डिलीट करने के लिए पूरी तरह आश्वस्त हूँ।
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
+                        <form method="POST" action="/delete_upload/{{ upload.id }}" class="d-inline">
+                            <button type="submit" id="finalDeleteUploadBtn{{ upload.id }}" class="btn btn-danger fw-bold px-4" disabled>हाँ, डिलीट करें</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Expense Edit & Delete Modals -->
+        {% for exp in expenses %}
+        <div class="modal fade" id="editExpenseModal{{ exp.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg">
+                    <form method="POST" action="/edit_expense/{{ exp.id }}">
+                        <div class="modal-header bg-warning text-dark">
+                            <h4 class="modal-title fw-bold">खर्च संपादित करें (Edit Expense)</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">विवरण (Title / Item Name)</label>
+                                <input type="text" class="form-control form-control-lg" name="title" value="{{ exp.title }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">श्रेणी (Category)</label>
+                                <select class="form-select form-select-lg" name="category">
+                                    <option value="Idol & Pratima" {% if exp.category == 'Idol & Pratima' %}selected{% endif %}>Idol & Pratima (मूर्ति एवं प्रतिमा)</option>
+                                    <option value="Pandal & Decor" {% if exp.category == 'Pandal & Decor' %}selected{% endif %}>Pandal & Decor (पंडाल एवं सजावट)</option>
+                                    <option value="Lighting & Sound" {% if exp.category == 'Lighting & Sound' %}selected{% endif %}>Lighting & Sound (लाइटिंग एवं साउंड)</option>
+                                    <option value="Bhog & Prasad" {% if exp.category == 'Bhog & Prasad' %}selected{% endif %}>Bhog & Prasad (भोग एवं प्रसाद)</option>
+                                    <option value="Artists & Dhaki" {% if exp.category == 'Artists & Dhaki' %}selected{% endif %}>Artists & Dhaki (कलाकार एवं ढाकी)</option>
+                                    <option value="Logistics & Misc" {% if exp.category == 'Logistics & Misc' %}selected{% endif %}>Logistics & Misc (लॉजिस्टिक्स एवं अन्य)</option>
+                                    <option value="Other" {% if exp.category == 'Other' %}selected{% endif %}>Other (अन्य)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">विक्रेता (Vendor Name)</label>
+                                <input type="text" class="form-control form-control-lg" name="vendor" value="{{ exp.vendor }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">खर्च राशि (Amount in ₹)</label>
+                                <input type="number" step="any" class="form-control form-control-lg" name="amount" value="{{ exp.amount }}" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
+                            <button type="submit" class="btn btn-primary fw-bold px-4">अपडेट करें</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteExpenseModal{{ exp.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg border-danger border-3">
+                    <div class="modal-header bg-danger text-white">
+                        <h4 class="modal-title fw-bold"><i class="fa fa-exclamation-triangle"></i> खर्च डिलीट करने की पुष्टि</h4>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body fs-5">
+                        <p class="fw-bold text-danger">क्या आप वाकई इस खर्च विवरण को हमेशा के लिए हटाना चाहते हैं?</p>
+                        <div class="p-3 bg-light border rounded mb-3">
+                            <strong>विवरण (Title):</strong> {{ exp.title }}<br>
+                            <strong>राशि (Amount):</strong> ₹ {{ exp.amount }}
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmDeleteExp{{ exp.id }}" required onchange="document.getElementById('finalDeleteExpBtn{{ exp.id }}').disabled = !this.checked;">
+                            <label class="form-check-label fw-bold fs-6 text-dark" for="confirmDeleteExp{{ exp.id }}">
+                                हाँ, मैं इसे डिलीट करने के लिए पूरी तरह आश्वस्त हूँ।
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
+                        <form method="POST" action="/delete_expense/{{ exp.id }}" class="d-inline">
+                            <button type="submit" id="finalDeleteExpBtn{{ exp.id }}" class="btn btn-danger fw-bold px-4" disabled>हाँ, डिलीट करें</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Contribution Edit & Delete Modals -->
+        {% for c in contributions %}
+        <div class="modal fade" id="editContribModal{{ c.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg">
+                    <form method="POST" action="/edit_contribution/{{ c.id }}">
+                        <div class="modal-header bg-primary text-white">
+                            <h4 class="modal-title fw-bold">चंदा संपादित करें (Edit Contribution)</h4>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">दाता का नाम (Donor Name)</label>
+                                <input type="text" class="form-control form-control-lg" name="name" value="{{ c.name }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">राशि (Amount in ₹)</label>
+                                <input type="number" step="any" class="form-control form-control-lg" name="amount" value="{{ c.amount }}" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
+                            <button type="submit" class="btn btn-success fw-bold px-4">अपडेट करें</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteContribModal{{ c.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg border-danger border-3">
+                    <div class="modal-header bg-danger text-white">
+                        <h4 class="modal-title fw-bold"><i class="fa fa-exclamation-triangle"></i> चंदा डिलीट करने की पुष्टि</h4>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body fs-5">
+                        <p class="fw-bold text-danger">क्या आप वाकई इस दाता का रिकॉर्ड हमेशा के लिए हटाना चाहते हैं?</p>
+                        <div class="p-3 bg-light border rounded mb-3">
+                            <strong>दाता का नाम (Donor):</strong> {{ c.name }}<br>
+                            <strong>राशि (Amount):</strong> ₹ {{ c.amount }}
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmDeleteContrib{{ c.id }}" required onchange="document.getElementById('finalDeleteContribBtn{{ c.id }}').disabled = !this.checked;">
+                            <label class="form-check-label fw-bold fs-6 text-dark" for="confirmDeleteContrib{{ c.id }}">
+                                हाँ, मैं इसे डिलीट करने के लिए पूरी तरह आश्वस्त हूँ।
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
+                        <form method="POST" action="/delete_contribution/{{ c.id }}" class="d-inline">
+                            <button type="submit" id="finalDeleteContribBtn{{ c.id }}" class="btn btn-danger fw-bold px-4" disabled>हाँ, डिलीट करें</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Add Contribution Modal -->
+        <div class="modal fade" id="contribModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg">
+                    <form method="POST" action="/add_contribution">
+                        <div class="modal-header bg-warning text-dark">
+                            <h4 class="modal-title fw-bold">चंदा देने वाला व्यक्ति जोड़ें</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">दाता का नाम (Donor Name)</label>
+                                <input type="text" class="form-control form-control-lg" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">राशि (Amount in ₹)</label>
+                                <input type="number" step="any" class="form-control form-control-lg" name="amount" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
+                            <button type="submit" class="btn btn-success fw-bold px-4">जोड़ें (Add)</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Expense Modal -->
+        <div class="modal fade" id="expenseModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg">
+                    <form method="POST" action="/add_expense">
+                        <div class="modal-header bg-danger text-white">
+                            <h4 class="modal-title fw-bold">नया खर्च जोड़ें (Add Expense)</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">विवरण (Title / Item Name)</label>
+                                <input type="text" class="form-control form-control-lg" name="title" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">श्रेणी (Category)</label>
+                                <select class="form-select form-select-lg" name="category">
+                                    <option value="Idol & Pratima">Idol & Pratima (मूर्ति एवं प्रतिमा)</option>
+                                    <option value="Pandal & Decor">Pandal & Decor (पंडाल एवं सजावट)</option>
+                                    <option value="Lighting & Sound">Lighting & Sound (लाइटिंग एवं साउंड)</option>
+                                    <option value="Bhog & Prasad">Bhog & Prasad (भोग एवं प्रसाद)</option>
+                                    <option value="Artists & Dhaki">Artists & Dhaki (कलाकार एवं ढाकी)</option>
+                                    <option value="Logistics & Misc">Logistics & Misc (लॉजिस्टिक्स एवं अन्य)</option>
+                                    <option value="Other">Other (अन्य)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">विक्रेता (Vendor Name)</label>
+                                <input type="text" class="form-control form-control-lg" name="vendor">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">खर्च राशि (Amount in ₹)</label>
+                                <input type="number" step="any" class="form-control form-control-lg" name="amount" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
+                            <button type="submit" class="btn btn-danger fw-bold px-4">खर्च दर्ज करें</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <footer class="text-center py-4 bg-dark text-white border-top mt-5">
+        <div class="container-fluid">
+            <h5 class="mb-1 fw-bold">Nabagram Village Sarbojanin Durgotsav Committee 2026</h5>
+            <p class="mb-1 text-light fs-6">Maintained by Puja Committee • All records verified by Village Treasury</p>
+            <p class="mb-0 fs-6 text-warning fw-bold">Sharadotsav 1432 / 2026 • Public financial audit for devotee trust & community harmony</p>
+            <p class="mt-2 mb-0 text-info fw-bold fs-5">Made by Ashok</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const rowsPerPage = 10;
+        let currentPage = 1;
+
+        function setupDonorsPagination() {
+            const table = document.getElementById("donorsTable");
+            const rows = Array.from(table.getElementsByClassName("donor-row"));
+            const paginationEl = document.getElementById("donorsPagination");
+            
+            const visibleRows = rows.filter(row => row.style.display !== "none");
+            const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
+
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+
+            visibleRows.forEach((row, index) => {
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                if (index >= start && index < end) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            let paginationHtml = "";
+            if (totalPages > 1) {
+                paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changeDonorPage(${currentPage - 1}); return false;">Previous</a></li>`;
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" onclick="changeDonorPage(${i}); return false;">${i}</a></li>`;
+                }
+                paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changeDonorPage(${currentPage + 1}); return false;">Next</a></li>`;
+            }
+            paginationEl.innerHTML = paginationHtml;
+        }
+
+        function changeDonorPage(page) {
+            currentPage = page;
+            setupDonorsPagination();
+        }
+
+        function filterDonorsTable() {
+            const input = document.getElementById("donorSearchInput");
+            const filter = input.value.toLowerCase();
+            const rows = document.getElementsByClassName("donor-row");
+
+            Array.from(rows).forEach(row => {
+                const name = row.getAttribute("data-name");
+                if (name.includes(filter)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+            currentPage = 1;
+            setupDonorsPagination();
+        }
+
+        window.onload = function() {
+            setupDonorsPagination();
+        };
+    </script>
+</body>
+</html>
