@@ -12,18 +12,18 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .header-section {
-            background: linear-gradient(135deg, rgba(162, 18, 43, 0.95), rgba(70, 5, 15, 0.95)), 
+            background: linear-gradient(135deg, rgba(120, 10, 30, 0.96), rgba(45, 2, 10, 0.98)), 
                         url('https://images.unsplash.com/photo-1603565816030-6b3892e2fea2?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
             color: white;
-            padding: 55px 20px;
+            padding: 65px 20px 45px 20px;
             border-bottom: 6px solid #ffd700;
             position: relative;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
         .portal-main-title {
-            font-size: 2.8rem;
+            font-size: 2.7rem;
             letter-spacing: 1.5px;
-            text-shadow: 3px 3px 8px rgba(0,0,0,0.8);
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.9);
             background: linear-gradient(to right, #ffffff, #fff176, #ffd54f);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -35,23 +35,25 @@
             right: 25px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             align-items: flex-end;
         }
         .action-btn {
-            background-color: rgba(255, 255, 255, 0.25);
+            background-color: rgba(255, 255, 255, 0.2);
             color: #fff;
             border: 2px solid #ffd700;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
             text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
         }
         .action-btn:hover {
             background-color: #ffd700;
             color: #000;
+            transform: translateY(-2px);
         }
         .full-report-btn {
             background-color: #198754;
@@ -59,6 +61,7 @@
         }
         .full-report-btn:hover {
             background-color: #157347;
+            color: #fff;
         }
         .card-custom {
             border: none;
@@ -112,11 +115,11 @@
         </div>
 
         <div class="container-fluid px-3">
-            <span class="badge bg-warning text-dark px-4 py-2 mb-3 fw-bold shadow-lg" style="font-size: 1.2rem; border: 2px solid #fff;">✨ LIVE PUBLIC AUDITED LEDGER 2026 ✨</span>
-            <h1 class="text-uppercase portal-main-title mb-2">PACHMO DURGA PUJA FUND & EXPENSE PORTAL 2026</h1>
-            <h2 class="text-warning mt-2 fw-bold" style="text-shadow: 2px 2px 6px rgba(0,0,0,0.9); font-size: 2.1rem;">( पचमो दुर्गा पूजा फंड और खर्च पोर्टल 2026 )</h2>
+            <span class="badge bg-warning text-dark px-4 py-2 mb-3 fw-bold shadow-lg" style="font-size: 1.1rem; border: 2px solid #fff; border-radius: 20px;">✨ LIVE PUBLIC AUDITED LEDGER 2026 ✨</span>
+            <h1 class="text-uppercase portal-main-title mb-1">PACHMO DURGA PUJA FUND & EXPENSE PORTAL 2026</h1>
+            <h2 class="text-warning mt-2 fw-bold" style="text-shadow: 2px 2px 6px rgba(0,0,0,0.9); font-size: 2rem;">( पचमो दुर्गा पूजा फंड और खर्च पोर्टल 2026 )</h2>
             <p class="text-light mt-2 mb-1 fs-5">Sharadotsav 1432 / 2026 • <span class="badge bg-success fs-6">Real-Time Verified</span></p>
-            <h3 class="text-info mt-2 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.9); font-size: 1.6rem;">नबयुवक संघ जीवन दुर्गा उत्सव 2026</h3>
+            <h3 class="text-info mt-2 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.9); font-size: 1.5rem;">नबयुवक संघ जीवन दुर्गा उत्सव 2026</h3>
             
             {% if session.get('logged_in') %}
                 <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
@@ -138,14 +141,14 @@
                 <div class="card card-custom p-4 bg-white border-start border-success border-4">
                     <h5 class="text-muted fw-bold">TOTAL COLLECTIONS ( कुल चंदा )</h5>
                     <h1 class="fw-bold text-success mt-2">₹ {{ total_collection }}</h1>
-                    <span class="text-muted fs-6">{{ contributions|length }} Contributing Families / Donors</span>
+                    <span class="text-muted fs-6 fw-bold">{{ total_collections_count }} Contributing Families / Donors</span>
                 </div>
             </div>
             <div class="col-xl-4 col-md-4">
                 <div class="card card-custom p-4 bg-white border-start border-danger border-4">
                     <h5 class="text-muted fw-bold">TOTAL EXPENSES ( कुल खर्च )</h5>
                     <h1 class="fw-bold text-danger mt-2">₹ {{ total_expenses }}</h1>
-                    <span class="text-muted fs-6">{{ expenses|length }} Festival Expenditures Logged</span>
+                    <span class="text-muted fs-6 fw-bold">{{ total_expenses_count }} Festival Expenditures Logged</span>
                 </div>
             </div>
             <div class="col-xl-4 col-md-4">
@@ -172,7 +175,7 @@
             </div>
         </div>
 
-        <!-- रजिस्टर मेंटेन फाइल (Register Maintain File Section) -->
+        <!-- रजिस्टर मेंटेन फाइल -->
         <div class="card card-custom p-4 bg-white mb-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                 <div>
@@ -232,11 +235,11 @@
                     <div class="d-flex align-items-center flex-wrap gap-3">
                         <h2 class="fw-bold text-dark mb-0">DETAILED EXPENSES LEDGER</h2>
                         <div class="d-flex gap-2">
-                            <span class="badge bg-dark fs-5 px-3 py-2">कुल प्रविष्टियाँ: {{ expenses|length }}</span>
+                            <span class="badge bg-dark fs-5 px-3 py-2">कुल प्रविष्टियाँ: {{ total_expenses_count }}</span>
                             <span class="badge bg-danger fs-5 px-3 py-2">कुल खर्च: ₹ {{ total_expenses }}</span>
                         </div>
                     </div>
-                    <p class="text-muted mb-0 fs-5 mt-1">खर्च का विस्तृत विवरण (Pratima, Mandap, Illumination, Bhog Seva, etc.)</p>
+                    <p class="text-muted mb-0 fs-5 mt-1">खर्च का विस्तृत विवरण</p>
                 </div>
                 
                 <div class="d-flex gap-2 flex-wrap">
@@ -314,7 +317,7 @@
                     <div class="d-flex align-items-center flex-wrap gap-3">
                         <h2 class="fw-bold text-dark mb-0"><i class="fa fa-hands-holding-child text-warning"></i> COMMUNITY CONTRIBUTIONS</h2>
                         <div class="d-flex gap-2">
-                            <span class="badge bg-primary fs-5 px-3 py-2">कुल दाता: {{ contributions|length }} व्यक्ति</span>
+                            <span class="badge bg-primary fs-5 px-3 py-2">कुल दाता: {{ total_collections_count }} व्यक्ति</span>
                             <span class="badge bg-success fs-5 px-3 py-2">कुल चंदा: ₹ {{ total_collection }}</span>
                         </div>
                     </div>
@@ -394,9 +397,8 @@
 
     </div>
 
-    <!-- Modals for Logged In Admin -->
+    <!-- Modals -->
     {% if session.get('logged_in') %}
-        <!-- Upload Delete Modals -->
         {% for upload in uploads %}
         <div class="modal fade" id="deleteUploadModal{{ upload.id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -429,7 +431,6 @@
         </div>
         {% endfor %}
 
-        <!-- Expense Edit & Delete Modals -->
         {% for exp in expenses %}
         <div class="modal fade" id="editExpenseModal{{ exp.id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -505,7 +506,6 @@
         </div>
         {% endfor %}
 
-        <!-- Contribution Edit & Delete Modals -->
         {% for c in contributions %}
         <div class="modal fade" id="editContribModal{{ c.id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -565,7 +565,6 @@
         </div>
         {% endfor %}
         
-        <!-- Add Contribution Modal -->
         <div class="modal fade" id="contribModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow-lg">
@@ -593,7 +592,6 @@
             </div>
         </div>
 
-        <!-- Add Expense Modal -->
         <div class="modal fade" id="expenseModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow-lg">
