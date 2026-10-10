@@ -100,6 +100,12 @@ def dashboard():
     category_filter = request.args.get('category', 'All Categories')
     search_query = request.args.get('search', '').strip()
     
+    # पैजिनेशन पैरामीटर्स (प्रति पृष्ठ 10 आइटम्स)
+    per_page = 10
+    page = int(request.args.get('page', 1))
+    offset = (page - 1) * per_page
+
+    # खर्च (Expenses) फ़िल्टर और क्वेरी
     query_exp = "SELECT * FROM expenses WHERE 1=1"
     params_exp = []
     if category_filter and category_filter != 'All Categories':
@@ -113,7 +119,12 @@ def dashboard():
     cursor.execute(query_exp, params_exp)
     expenses = cursor.fetchall()
 
-    cursor.execute("SELECT * FROM collections ORDER BY id DESC")
+    # चंदा (Collections) के लिए पैजिनेशन लॉजिक
+    cursor.execute("SELECT COUNT(*) FROM collections")
+    total_collections_count = cursor.fetchone()['count']
+    total_pages = (total_collections_count + per_page - 1) // per_page
+
+    cursor.execute("SELECT * FROM collections ORDER BY id DESC LIMIT %s OFFSET %s", (per_page, offset))
     contributions = cursor.fetchall()
 
     cursor.execute("SELECT * FROM uploads ORDER BY id DESC")
@@ -129,7 +140,9 @@ def dashboard():
         contributions=contributions,
         uploads=uploads,
         selected_category=category_filter,
-        search_query=search_query
+        search_query=search_query,
+        current_page=page,
+        total_pages=total_pages
     )
 
 @app.route('/upload', methods=['POST'])
