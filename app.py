@@ -91,9 +91,7 @@ def logout():
 
 @app.route('/dashboard')
 def dashboard():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-        
+    # पब्लिक यूजर भी अब प्रीव्यू देख सकते हैं, लॉगिन सिर्फ एडिट/डिटेल एक्शन के लिए ज़रूरी है
     db = get_db()
     cursor = db.cursor()
 
@@ -268,8 +266,6 @@ def delete_contribution(id):
 
 @app.route('/download_contribution_report')
 def download_contribution_report():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
     db = get_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM collections ORDER BY id DESC")
@@ -280,8 +276,6 @@ def download_contribution_report():
 
 @app.route('/download_expense_report')
 def download_expense_report():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
     db = get_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM expenses ORDER BY id DESC")
@@ -292,8 +286,6 @@ def download_expense_report():
 
 @app.route('/download_full_report')
 def download_full_report():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
     db = get_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM collections ORDER BY id DESC")
