@@ -12,21 +12,22 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .header-section {
-            background: linear-gradient(135deg, rgba(142, 23, 42, 0.88), rgba(80, 10, 20, 0.85)), 
+            background: linear-gradient(135deg, rgba(162, 18, 43, 0.95), rgba(70, 5, 15, 0.95)), 
                         url('https://images.unsplash.com/photo-1603565816030-6b3892e2fea2?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
             color: white;
-            padding: 50px 20px;
-            border-bottom: 6px solid #ffc107;
+            padding: 55px 20px;
+            border-bottom: 6px solid #ffd700;
             position: relative;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
         .portal-main-title {
-            font-size: 2.6rem;
-            letter-spacing: 1px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
-            background: linear-gradient(to right, #ffffff, #ffecb3, #ffe082);
+            font-size: 2.8rem;
+            letter-spacing: 1.5px;
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.8);
+            background: linear-gradient(to right, #ffffff, #fff176, #ffd54f);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-weight: 900;
         }
         .header-actions {
             position: absolute;
@@ -40,7 +41,7 @@
         .action-btn {
             background-color: rgba(255, 255, 255, 0.25);
             color: #fff;
-            border: 2px solid #ffc107;
+            border: 2px solid #ffd700;
             font-weight: bold;
             font-size: 0.9rem;
             transition: all 0.3s ease;
@@ -49,7 +50,7 @@
             border-radius: 5px;
         }
         .action-btn:hover {
-            background-color: #ffc107;
+            background-color: #ffd700;
             color: #000;
         }
         .full-report-btn {
@@ -111,11 +112,11 @@
         </div>
 
         <div class="container-fluid px-3">
-            <span class="badge bg-warning text-dark px-3 py-2 mb-3 fw-bold shadow" style="font-size: 1.1rem;">✨ LIVE PUBLIC AUDITED LEDGER 2026 ✨</span>
-            <h1 class="fw-bold text-uppercase portal-main-title">PACHMO DURGA PUJA FUND & EXPENSE PORTAL 2026</h1>
-            <h2 class="text-warning mt-2 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">( पचमो दुर्गा पूजा फंड और खर्च पोर्टल 2026 )</h2>
+            <span class="badge bg-warning text-dark px-4 py-2 mb-3 fw-bold shadow-lg" style="font-size: 1.2rem; border: 2px solid #fff;">✨ LIVE PUBLIC AUDITED LEDGER 2026 ✨</span>
+            <h1 class="text-uppercase portal-main-title mb-2">PACHMO DURGA PUJA FUND & EXPENSE PORTAL 2026</h1>
+            <h2 class="text-warning mt-2 fw-bold" style="text-shadow: 2px 2px 6px rgba(0,0,0,0.9); font-size: 2.1rem;">( पचमो दुर्गा पूजा फंड और खर्च पोर्टल 2026 )</h2>
             <p class="text-light mt-2 mb-1 fs-5">Sharadotsav 1432 / 2026 • <span class="badge bg-success fs-6">Real-Time Verified</span></p>
-            <h3 class="text-info mt-2 fw-bold" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">नबयुवक संघ जीवन दुर्गा उत्सव 2026</h3>
+            <h3 class="text-info mt-2 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.9); font-size: 1.6rem;">नबयुवक संघ जीवन दुर्गा उत्सव 2026</h3>
             
             {% if session.get('logged_in') %}
                 <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
@@ -348,7 +349,7 @@
                         {% for c in contributions %}
                         {% set color_class = name_colors[loop.index0 % name_colors|length] %}
                         <tr class="donor-row" data-name="{{ c.name|lower }}">
-                            <td class="fw-bold donor-index">{{ loop.index }}</td>
+                            <td class="fw-bold donor-index">{{ (current_page - 1) * 10 + loop.index }}</td>
                             <td class="fw-bold fs-3 {{ color_class }}">{{ c.name }}</td>
                             <td class="text-muted">{{ c.date }}</td>
                             <td class="fw-bold text-success fs-3">₹ {{ c.amount }}</td>
@@ -374,8 +375,19 @@
                 </table>
             </div>
 
-            <nav aria-label="Donors Page Navigation" class="mt-3">
-                <ul class="pagination justify-content-center" id="donorsPagination">
+            <nav aria-label="Donors Page Navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if current_page <= 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', page=current_page - 1) }}">Previous</a>
+                    </li>
+                    {% for p in range(1, total_pages + 1) %}
+                    <li class="page-item {% if p == current_page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', page=p) }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item {% if current_page >= total_pages %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', page=current_page + 1) }}">Next</a>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -603,7 +615,7 @@
                                     <option value="Lighting & Sound">Lighting & Sound (लाइटिंग एवं साउंड)</option>
                                     <option value="Bhog & Prasad">Bhog & Prasad (भोग एवं प्रसाद)</option>
                                     <option value="Artists & Dhaki">Artists & Dhaki (कलाकार एवं ढाकी)</option>
-                                    <option value="Logistics & Misc">Logistics & Misc (लॉजिस्टिक्स एवं अन्य)</option>
+                                    <option style="width: 5%;">Logistics & Misc</option>
                                     <option value="Other">Other (अन्य)</option>
                                 </select>
                             </div>
@@ -637,45 +649,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const rowsPerPage = 10;
-        let currentPage = 1;
-
-        function setupDonorsPagination() {
-            const table = document.getElementById("donorsTable");
-            const rows = Array.from(table.getElementsByClassName("donor-row"));
-            const paginationEl = document.getElementById("donorsPagination");
-            
-            const visibleRows = rows.filter(row => row.style.display !== "none");
-            const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
-
-            if (currentPage > totalPages) currentPage = totalPages || 1;
-
-            visibleRows.forEach((row, index) => {
-                const start = (currentPage - 1) * rowsPerPage;
-                const end = start + rowsPerPage;
-                if (index >= start && index < end) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-
-            let paginationHtml = "";
-            if (totalPages > 1) {
-                paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changeDonorPage(${currentPage - 1}); return false;">Previous</a></li>`;
-                for (let i = 1; i <= totalPages; i++) {
-                    paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" onclick="changeDonorPage(${i}); return false;">${i}</a></li>`;
-                }
-                paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changeDonorPage(${currentPage + 1}); return false;">Next</a></li>`;
-            }
-            paginationEl.innerHTML = paginationHtml;
-        }
-
-        function changeDonorPage(page) {
-            currentPage = page;
-            setupDonorsPagination();
-        }
-
         function filterDonorsTable() {
             const input = document.getElementById("donorSearchInput");
             const filter = input.value.toLowerCase();
@@ -689,13 +662,7 @@
                     row.style.display = "none";
                 }
             });
-            currentPage = 1;
-            setupDonorsPagination();
         }
-
-        window.onload = function() {
-            setupDonorsPagination();
-        };
     </script>
 </body>
 </html>
