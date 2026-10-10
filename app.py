@@ -1,5 +1,5 @@
 from datetime import timedelta
-from flask import Flask, render_template, request, redirect, url_for, g, session, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, g, session
 import os
 import psycopg2
 import psycopg2.extras
@@ -187,14 +187,12 @@ def upload_file():
     if file:
         filename = secure_filename(file.filename)
         try:
-            # फाईल एक्सटेंशन के आधार पर सही resource_type तय करें ताकि PDF के लिए ACL failure न हो
             ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
             res_type = "raw" if ext == 'pdf' else "auto"
 
             upload_result = cloudinary.uploader.upload(file, resource_type=res_type)
             file_url = upload_result.get('secure_url')
         except Exception as e:
-            # फॉलबैक
             file_url = "#"
         
         db = get_db()
