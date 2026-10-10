@@ -126,9 +126,14 @@ def dashboard():
     cursor.execute(query_exp, params_exp)
     expenses = cursor.fetchall()
 
+    # कुल दाताओं और खर्चों की सटीक कुल संख्या प्राप्त करने के लिए
     cursor.execute("SELECT COUNT(*) AS count FROM collections")
     total_collections_count = cursor.fetchone()['count']
-    total_pages = (total_collections_count + per_page - 1) // per_page
+    
+    cursor.execute("SELECT COUNT(*) AS count FROM expenses")
+    total_expenses_count = cursor.fetchone()['count']
+
+    total_pages = (total_collections_count + per_page - 1) // per_page if total_collections_count > 0 else 1
 
     cursor.execute("SELECT * FROM collections ORDER BY id DESC LIMIT %s OFFSET %s", (per_page, offset))
     contributions = cursor.fetchall()
@@ -148,7 +153,9 @@ def dashboard():
         selected_category=category_filter,
         search_query=search_query,
         current_page=page,
-        total_pages=total_pages
+        total_pages=total_pages,
+        total_collections_count=total_collections_count,
+        total_expenses_count=total_expenses_count
     )
 
 @app.route('/upload', methods=['POST'])
