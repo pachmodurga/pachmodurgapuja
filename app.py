@@ -4,6 +4,8 @@ import os
 import psycopg2
 import psycopg2.extras
 from werkzeug.utils import secure_filename
+import cloudinary
+import cloudinary.uploader
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -12,11 +14,13 @@ app.secret_key = 'your_secret_key_here'
 app.permanent_session_lifetime = timedelta(minutes=10)
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+# Cloudinary कॉन्फ़िगरेशन (Render के Environment Variables से स्वतः ले लेगा)
+cloudinary.config(
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key = os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET')
+)
 
 @app.before_request
 def make_session_permanent():
@@ -63,6 +67,7 @@ def init_db():
             CREATE TABLE IF NOT EXISTS uploads (
                 id SERIAL PRIMARY KEY,
                 filename TEXT NOT NULL,
+                file_url TEXT,
                 date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -111,14 +116,12 @@ def dashboard():
     
     per_page = 10
     
-    # अलग-अलग पेज नंबर ट्रैकिंग
     contrib_page = int(request.args.get('contrib_page', 1))
     contrib_offset = (contrib_page - 1) * per_page
 
     expense_page = int(request.args.get('expense_page', 1))
     expense_offset = (expense_page - 1) * per_page
 
-    # खर्चों के लिए क्वेरी और पैजिनेशन
     query_exp = "SELECT * FROM expenses WHERE 1=1"
     params_exp = []
     if category_filter and category_filter != 'All Categories':
@@ -128,7 +131,6 @@ def dashboard():
         query_exp += " AND (title ILIKE %s OR vendor ILIKE %s)"
         params_exp.extend([f"%{search_query}%", f"%{search_query}%"])
     
-    # कुल खर्चों की संख्या (फिल्टर के साथ या बिना)
     count_query_exp = f"SELECT COUNT(*) AS count FROM ({query_exp}) AS sub"
     cursor.execute(count_query_exp, params_exp)
     total_expenses_filtered_count = cursor.fetchone()['count']
@@ -140,7 +142,6 @@ def dashboard():
     cursor.execute(query_exp, params_exp)
     expenses = cursor.fetchall()
 
-    # कुल दाताओं और कुल खर्चों की समग्र संख्या (डैशबोर्ड कार्ड्स के लिए)
     cursor.execute("SELECT COUNT(*) AS count FROM collections")
     total_collections_count = cursor.fetchone()['count']
     
@@ -185,16 +186,19 @@ def upload_file():
         return redirect(request.url)
     if file:
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        try:
+            # फाइल को सीधे Cloudinary पर अपलोड करें
+            upload_result = cloudinary.uploader.upload(file, resource_type="auto")
+            file_url = upload_result.get('secure_url')
+        except Exception as e:
+            # अगर Cloudinary कॉन्फिगर न हो तो फॉلबैक
+            file_url = "#"
+        
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("INSERT INTO uploads (filename) VALUES (%s)", (filename,))
+        cursor.execute("INSERT INTO uploads (filename, file_url) VALUES (%s, %s)", (filename, file_url))
         db.commit()
     return redirect(url_for('dashboard'))
-
-@app.route('/uploads/<filename>')
-def serve_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/delete_upload/<int:id>', methods=['POST'])
 def delete_upload(id):
@@ -202,15 +206,8 @@ def delete_upload(id):
         return redirect(url_for('login'))
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT filename FROM uploads WHERE id = %s", (id,))
-    upload = cursor.fetchone()
-    if upload:
-        filename = upload['filename']
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        if os.path.exists(file_path):
-            os.remove(file_path)
-        cursor.execute("DELETE FROM uploads WHERE id = %s", (id,))
-        db.commit()
+    cursor.execute("DELETE FROM uploads WHERE id = %s", (id,))
+    db.commit()
     return redirect(url_for('dashboard'))
 
 @app.route('/add_contribution', methods=['POST'])
