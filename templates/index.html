@@ -12,22 +12,28 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .header-section {
-            background: linear-gradient(135deg, rgba(120, 10, 30, 0.96), rgba(45, 2, 10, 0.98)), 
+            background: linear-gradient(135deg, rgba(80, 2, 10, 0.98), rgba(30, 0, 5, 0.99)), 
                         url('https://images.unsplash.com/photo-1603565816030-6b3892e2fea2?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
             color: white;
-            padding: 65px 20px 45px 20px;
-            border-bottom: 6px solid #ffd700;
+            padding: 70px 20px 50px 20px;
+            border-bottom: 8px solid #ffcc00;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.5);
         }
         .portal-main-title {
-            font-size: 2.7rem;
+            font-size: 2.8rem;
             letter-spacing: 1.5px;
-            text-shadow: 3px 3px 10px rgba(0,0,0,0.9);
-            background: linear-gradient(to right, #ffffff, #fff176, #ffd54f);
+            text-shadow: 3px 3px 15px rgba(255, 215, 0, 0.6);
+            background: linear-gradient(to right, #ffeb3b, #ffc107, #ff9800, #ffeb3b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 900;
+        }
+        .portal-sub-title {
+            color: #ffeb3b !important;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.95);
+            font-size: 2.1rem;
+            font-weight: 800;
         }
         .header-actions {
             position: absolute;
@@ -39,9 +45,9 @@
             align-items: flex-end;
         }
         .action-btn {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 235, 59, 0.2);
             color: #fff;
-            border: 2px solid #ffd700;
+            border: 2px solid #ffeb3b;
             font-weight: bold;
             font-size: 0.95rem;
             transition: all 0.3s ease;
@@ -51,7 +57,7 @@
             backdrop-filter: blur(5px);
         }
         .action-btn:hover {
-            background-color: #ffd700;
+            background-color: #ffeb3b;
             color: #000;
             transform: translateY(-2px);
         }
@@ -117,7 +123,7 @@
         <div class="container-fluid px-3">
             <span class="badge bg-warning text-dark px-4 py-2 mb-3 fw-bold shadow-lg" style="font-size: 1.1rem; border: 2px solid #fff; border-radius: 20px;">✨ LIVE PUBLIC AUDITED LEDGER 2026 ✨</span>
             <h1 class="text-uppercase portal-main-title mb-1">PACHMO DURGA PUJA FUND & EXPENSE PORTAL 2026</h1>
-            <h2 class="text-warning mt-2 fw-bold" style="text-shadow: 2px 2px 6px rgba(0,0,0,0.9); font-size: 2rem;">( पचमो दुर्गा पूजा फंड और खर्च पोर्टल 2026 )</h2>
+            <h2 class="portal-sub-title mt-2 mb-2">( पचमो दुर्गा पूजा फंड और खर्च पोर्टल 2026 )</h2>
             <p class="text-light mt-2 mb-1 fs-5">Sharadotsav 1432 / 2026 • <span class="badge bg-success fs-6">Real-Time Verified</span></p>
             <h3 class="text-info mt-2 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.9); font-size: 1.5rem;">नबयुवक संघ जीवन दुर्गा उत्सव 2026</h3>
             
@@ -229,6 +235,7 @@
             </div>
         </div>
 
+        <!-- खर्चों की टेबल (Detailed Expenses Ledger) -->
         <div class="card card-custom p-4 bg-white mb-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                 <div>
@@ -247,6 +254,7 @@
                         <i class="fa fa-file-pdf"></i> खर्च रिपोर्ट (PDF)
                     </a>
                     <form method="GET" action="/dashboard" class="d-flex" style="max-width: 320px; width: 100%;">
+                        <input type="hidden" name="category" value="{{ selected_category }}">
                         <input type="text" name="search" class="form-control form-control-lg" placeholder="Search item, vendor..." value="{{ search_query }}">
                         <button type="submit" class="btn btn-outline-primary ms-2 px-3"><i class="fa fa-search"></i></button>
                     </form>
@@ -282,7 +290,7 @@
                     <tbody>
                         {% for exp in expenses %}
                         <tr>
-                            <td class="fw-bold">{{ loop.index }}</td>
+                            <td class="fw-bold">{{ (expense_page - 1) * 10 + loop.index }}</td>
                             <td class="fw-bold text-dark fs-4">{{ exp.title }}</td>
                             <td><span class="badge bg-secondary fs-6">{{ exp.category }}</span></td>
                             <td class="fw-semibold">{{ exp.vendor }}</td>
@@ -309,8 +317,26 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- खर्चों के लिए पैजिनेशन -->
+            <nav aria-label="Expense Page Navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if expense_page <= 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', expense_page=expense_page - 1, contrib_page=contrib_page, category=selected_category, search=search_query) }}">Previous</a>
+                    </li>
+                    {% for p in range(1, total_expense_pages + 1) %}
+                    <li class="page-item {% if p == expense_page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', expense_page=p, contrib_page=contrib_page, category=selected_category, search=search_query) }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item {% if expense_page >= total_expense_pages %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', expense_page=expense_page + 1, contrib_page=contrib_page, category=selected_category, search=search_query) }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
+        <!-- समुदाय चंदा टेबल (Community Contributions) -->
         <div class="card card-custom p-4 bg-white mb-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                 <div>
@@ -352,7 +378,7 @@
                         {% for c in contributions %}
                         {% set color_class = name_colors[loop.index0 % name_colors|length] %}
                         <tr class="donor-row" data-name="{{ c.name|lower }}">
-                            <td class="fw-bold donor-index">{{ (current_page - 1) * 10 + loop.index }}</td>
+                            <td class="fw-bold donor-index">{{ (contrib_page - 1) * 10 + loop.index }}</td>
                             <td class="fw-bold fs-3 {{ color_class }}">{{ c.name }}</td>
                             <td class="text-muted">{{ c.date }}</td>
                             <td class="fw-bold text-success fs-3">₹ {{ c.amount }}</td>
@@ -378,18 +404,19 @@
                 </table>
             </div>
 
+            <!-- चंदा के लिए पैजिनेशन -->
             <nav aria-label="Donors Page Navigation" class="mt-4">
                 <ul class="pagination justify-content-center">
-                    <li class="page-item {% if current_page <= 1 %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', page=current_page - 1) }}">Previous</a>
+                    <li class="page-item {% if contrib_page <= 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', contrib_page=contrib_page - 1, expense_page=expense_page, category=selected_category, search=search_query) }}">Previous</a>
                     </li>
-                    {% for p in range(1, total_pages + 1) %}
-                    <li class="page-item {% if p == current_page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', page=p) }}">{{ p }}</a>
+                    {% for p in range(1, total_contrib_pages + 1) %}
+                    <li class="page-item {% if p == contrib_page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', contrib_page=p, expense_page=expense_page, category=selected_category, search=search_query) }}">{{ p }}</a>
                     </li>
                     {% endfor %}
-                    <li class="page-item {% if current_page >= total_pages %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', page=current_page + 1) }}">Next</a>
+                    <li class="page-item {% if contrib_page >= total_contrib_pages %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', contrib_page=contrib_page + 1, expense_page=expense_page, category=selected_category, search=search_query) }}">Next</a>
                     </li>
                 </ul>
             </nav>
