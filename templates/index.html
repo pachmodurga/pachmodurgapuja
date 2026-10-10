@@ -214,8 +214,12 @@
                             <td class="text-muted">{{ upload.date }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ upload.file_url }}" class="btn btn-outline-primary fw-bold px-3 py-2" target="_blank" title="Download">
-                                        <i class="fa fa-download"></i> देखें
+                                    {% set view_url = upload.file_url %}
+                                    {% if view_url and 'cloudinary.com' in view_url and view_url.endswith('.pdf') %}
+                                        {% set view_url = view_url.replace('/upload/', '/upload/fl_inline/') %}
+                                    {% endif %}
+                                    <a href="{{ view_url }}" class="btn btn-outline-primary fw-bold px-3 py-2" target="_blank" title="View PDF">
+                                        <i class="fa fa-eye"></i> देखें
                                     </a>
                                     {% if session.get('logged_in') %}
                                         <button type="button" class="btn btn-danger fw-bold px-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteUploadModal{{ upload.id }}" title="Delete File">
