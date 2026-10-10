@@ -1,3 +1,4 @@
+from datetime import timedelta
 from flask import Flask, render_template, request, redirect, url_for, g, session, send_from_directory
 import os
 import psycopg2
@@ -7,14 +8,19 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 
-# Render या अन्य क्लाउड प्लेटफ़ॉर्म पर सेट किए गए DATABASE_URL का उपयोग करें
-DATABASE_URL = os.environ.get('DATABASE_URL')
+# सेशन को परमानेंट मार्क करें और 10 मिनट का टाइमआउट सेट करें
+app.permanent_session_lifetime = timedelta(minutes=10)
 
+DATABASE_URL = os.environ.get('DATABASE_URL')
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -85,6 +91,9 @@ def logout():
 
 @app.route('/dashboard')
 def dashboard():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+        
     db = get_db()
     cursor = db.cursor()
 
@@ -100,12 +109,10 @@ def dashboard():
     category_filter = request.args.get('category', 'All Categories')
     search_query = request.args.get('search', '').strip()
     
-    # पैजिनेशन पैरामीटर्स (प्रति पृष्ठ 10 आइटम्स)
     per_page = 10
     page = int(request.args.get('page', 1))
     offset = (page - 1) * per_page
 
-    # खर्च (Expenses) फ़िल्टर और क्वेरी
     query_exp = "SELECT * FROM expenses WHERE 1=1"
     params_exp = []
     if category_filter and category_filter != 'All Categories':
@@ -119,7 +126,6 @@ def dashboard():
     cursor.execute(query_exp, params_exp)
     expenses = cursor.fetchall()
 
-    # चंदा (Collections) के लिए पैजिनेशन लॉजिक
     cursor.execute("SELECT COUNT(*) FROM collections")
     total_collections_count = cursor.fetchone()['count']
     total_pages = (total_collections_count + per_page - 1) // per_page
@@ -262,6 +268,8 @@ def delete_contribution(id):
 
 @app.route('/download_contribution_report')
 def download_contribution_report():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
     db = get_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM collections ORDER BY id DESC")
@@ -272,6 +280,8 @@ def download_contribution_report():
 
 @app.route('/download_expense_report')
 def download_expense_report():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
     db = get_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM expenses ORDER BY id DESC")
@@ -282,6 +292,8 @@ def download_expense_report():
 
 @app.route('/download_full_report')
 def download_full_report():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
     db = get_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM collections ORDER BY id DESC")
