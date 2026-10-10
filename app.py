@@ -187,11 +187,14 @@ def upload_file():
     if file:
         filename = secure_filename(file.filename)
         try:
-            # फाइल को सीधे Cloudinary पर अपलोड करें
-            upload_result = cloudinary.uploader.upload(file, resource_type="auto")
+            # फाईल एक्सटेंशन के आधार पर सही resource_type तय करें ताकि PDF के लिए ACL failure न हो
+            ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+            res_type = "raw" if ext == 'pdf' else "auto"
+
+            upload_result = cloudinary.uploader.upload(file, resource_type=res_type)
             file_url = upload_result.get('secure_url')
         except Exception as e:
-            # अगर Cloudinary कॉन्फिगर न हो तो फॉلबैक
+            # फॉलबैक
             file_url = "#"
         
         db = get_db()
