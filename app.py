@@ -110,9 +110,15 @@ def dashboard():
     search_query = request.args.get('search', '').strip()
     
     per_page = 10
-    page = int(request.args.get('page', 1))
-    offset = (page - 1) * per_page
+    
+    # अलग-अलग पेज नंबर ट्रैकिंग
+    contrib_page = int(request.args.get('contrib_page', 1))
+    contrib_offset = (contrib_page - 1) * per_page
 
+    expense_page = int(request.args.get('expense_page', 1))
+    expense_offset = (expense_page - 1) * per_page
+
+    # खर्चों के लिए क्वेरी और पैजिनेशन
     query_exp = "SELECT * FROM expenses WHERE 1=1"
     params_exp = []
     if category_filter and category_filter != 'All Categories':
@@ -121,21 +127,29 @@ def dashboard():
     if search_query:
         query_exp += " AND (title ILIKE %s OR vendor ILIKE %s)"
         params_exp.extend([f"%{search_query}%", f"%{search_query}%"])
-    query_exp += " ORDER BY id DESC"
+    
+    # कुल खर्चों की संख्या (फिल्टर के साथ या बिना)
+    count_query_exp = f"SELECT COUNT(*) AS count FROM ({query_exp}) AS sub"
+    cursor.execute(count_query_exp, params_exp)
+    total_expenses_filtered_count = cursor.fetchone()['count']
+    total_expense_pages = (total_expenses_filtered_count + per_page - 1) // per_page if total_expenses_filtered_count > 0 else 1
+
+    query_exp += " ORDER BY id DESC LIMIT %s OFFSET %s"
+    params_exp.extend([per_page, expense_offset])
     
     cursor.execute(query_exp, params_exp)
     expenses = cursor.fetchall()
 
-    # कुल दाताओं और खर्चों की सटीक कुल संख्या प्राप्त करने के लिए
+    # कुल दाताओं और कुल खर्चों की समग्र संख्या (डैशबोर्ड कार्ड्स के लिए)
     cursor.execute("SELECT COUNT(*) AS count FROM collections")
     total_collections_count = cursor.fetchone()['count']
     
     cursor.execute("SELECT COUNT(*) AS count FROM expenses")
     total_expenses_count = cursor.fetchone()['count']
 
-    total_pages = (total_collections_count + per_page - 1) // per_page if total_collections_count > 0 else 1
+    total_contrib_pages = (total_collections_count + per_page - 1) // per_page if total_collections_count > 0 else 1
 
-    cursor.execute("SELECT * FROM collections ORDER BY id DESC LIMIT %s OFFSET %s", (per_page, offset))
+    cursor.execute("SELECT * FROM collections ORDER BY id DESC LIMIT %s OFFSET %s", (per_page, contrib_offset))
     contributions = cursor.fetchall()
 
     cursor.execute("SELECT * FROM uploads ORDER BY id DESC")
@@ -152,8 +166,10 @@ def dashboard():
         uploads=uploads,
         selected_category=category_filter,
         search_query=search_query,
-        current_page=page,
-        total_pages=total_pages,
+        contrib_page=contrib_page,
+        total_contrib_pages=total_contrib_pages,
+        expense_page=expense_page,
+        total_expense_pages=total_expense_pages,
         total_collections_count=total_collections_count,
         total_expenses_count=total_expenses_count
     )
