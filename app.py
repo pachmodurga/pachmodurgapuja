@@ -68,6 +68,9 @@ def init_db():
         ''')
         db.commit()
 
+# ऐप शुरू होते ही टेबल बनाने के लिए इनिशियलाइज़ेशन कॉल
+init_db()
+
 @app.route('/')
 def landing():
     return render_template('landing.html')
@@ -91,14 +94,13 @@ def logout():
 
 @app.route('/dashboard')
 def dashboard():
-    # यहाँ से लॉगिन की पाबंदी हटा दी गई है ताकि पब्लिक प्रीव्यू बिना एरर के काम करे
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute("SELECT COALESCE(SUM(amount), 0) FROM collections")
+    cursor.execute("SELECT COALESCE(SUM(amount), 0) AS coalesce FROM collections")
     total_collection = cursor.fetchone()['coalesce']
 
-    cursor.execute("SELECT COALESCE(SUM(amount), 0) FROM expenses")
+    cursor.execute("SELECT COALESCE(SUM(amount), 0) AS coalesce FROM expenses")
     total_expenses = cursor.fetchone()['coalesce']
 
     available_balance = total_collection - total_expenses
@@ -124,7 +126,7 @@ def dashboard():
     cursor.execute(query_exp, params_exp)
     expenses = cursor.fetchall()
 
-    cursor.execute("SELECT COUNT(*) FROM collections")
+    cursor.execute("SELECT COUNT(*) AS count FROM collections")
     total_collections_count = cursor.fetchone()['count']
     total_pages = (total_collections_count + per_page - 1) // per_page
 
@@ -270,7 +272,7 @@ def download_contribution_report():
     cursor = db.cursor()
     cursor.execute("SELECT * FROM collections ORDER BY id DESC")
     contributions = cursor.fetchall()
-    cursor.execute("SELECT COALESCE(SUM(amount), 0) FROM collections")
+    cursor.execute("SELECT COALESCE(SUM(amount), 0) AS coalesce FROM collections")
     total = cursor.fetchone()['coalesce']
     return render_template('report_print.html', title="चंदा रिपोर्ट", data=contributions, total=total, type="contrib")
 
@@ -280,7 +282,7 @@ def download_expense_report():
     cursor = db.cursor()
     cursor.execute("SELECT * FROM expenses ORDER BY id DESC")
     expenses = cursor.fetchall()
-    cursor.execute("SELECT COALESCE(SUM(amount), 0) FROM expenses")
+    cursor.execute("SELECT COALESCE(SUM(amount), 0) AS coalesce FROM expenses")
     total = cursor.fetchone()['coalesce']
     return render_template('report_print.html', title="खर्च रिपोर्ट", data=expenses, total=total, type="expense")
 
@@ -290,11 +292,11 @@ def download_full_report():
     cursor = db.cursor()
     cursor.execute("SELECT * FROM collections ORDER BY id DESC")
     contributions = cursor.fetchall()
-    cursor.execute("SELECT COALESCE(SUM(amount), 0) FROM collections")
+    cursor.execute("SELECT COALESCE(SUM(amount), 0) AS coalesce FROM collections")
     total_collection = cursor.fetchone()['coalesce']
     cursor.execute("SELECT * FROM expenses ORDER BY id DESC")
     expenses = cursor.fetchall()
-    cursor.execute("SELECT COALESCE(SUM(amount), 0) FROM expenses")
+    cursor.execute("SELECT COALESCE(SUM(amount), 0) AS coalesce FROM expenses")
     total_expenses = cursor.fetchone()['coalesce']
     available_balance = total_collection - total_expenses
     utilization_ratio = round((total_expenses / total_collection) * 100, 1) if total_collection > 0 else 0.0
@@ -307,5 +309,4 @@ def download_full_report():
                            utilization_ratio=utilization_ratio)
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True, port=5000)
