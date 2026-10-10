@@ -214,7 +214,7 @@
                             <td class="text-muted">{{ upload.date }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="/uploads/{{ upload.filename }}" class="btn btn-outline-primary fw-bold px-3 py-2" target="_blank" title="Download">
+                                    <a href="{{ upload.file_url }}" class="btn btn-outline-primary fw-bold px-3 py-2" target="_blank" title="Download">
                                         <i class="fa fa-download"></i> देखें
                                     </a>
                                     {% if session.get('logged_in') %}
