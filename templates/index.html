@@ -426,6 +426,84 @@
             </nav>
         </div>
 
+        <!-- चंदा नहीं देने वाले की टेबल (Non-Donors List) -->
+        <div class="card card-custom p-4 bg-white mb-4 border-top border-warning border-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                <div>
+                    <div class="d-flex align-items-center flex-wrap gap-3">
+                        <h2 class="fw-bold text-dark mb-0"><i class="fa fa-user-slash text-danger"></i> चंदा नहीं देने वाले (Non-Donors List)</h2>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-danger fs-5 px-3 py-2">कुल संख्या: {{ total_non_donors_count }} व्यक्ति</span>
+                        </div>
+                    </div>
+                    p class="text-muted mb-0 fs-5 mt-1">जिन परिवारों/व्यक्तियों द्वारा चंदा नहीं दिया गया है उनका विवरण</p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <div class="d-flex" style="max-width: 280px; width: 100%;">
+                        <input type="text" id="nonDonorSearchInput" class="form-control form-control-lg" placeholder="नाम खोजें..." onkeyup="filterNonDonorsTable()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped align-middle table-bordered fs-5" id="nonDonorsTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 10%;">#</th>
+                            <th style="width: 55%;">व्यक्ति / परिवार का नाम (Name)</th>
+                            <th style="width: 25%;">तारीख (Date)</th>
+                            {% if session.get('logged_in') %}
+                                <th style="width: 10%;">एक्शन (Actions)</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for nd in non_donors %}
+                        <tr class="non-donor-row" data-name="{{ nd.name|lower }}">
+                            <td class="fw-bold">{{ (non_donor_page - 1) * 10 + loop.index }}</td>
+                            <td class="fw-bold fs-3 text-secondary">{{ nd.name }}</td>
+                            <td class="text-muted">{{ nd.date }}</td>
+                            {% if session.get('logged_in') %}
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-primary fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editNonDonorModal{{ nd.id }}" title="Edit">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteNonDonorModal{{ nd.id }}" title="Delete">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            {% endif %}
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="{{ 4 if session.get('logged_in') else 3 }}" class="text-center text-muted py-4 fs-5">कोई रिकॉर्ड नहीं मिला।</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- नॉन-डोनर्स के लिए पैजिनेशन -->
+            <nav aria-label="Non-Donor Page Navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if non_donor_page <= 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', non_donor_page=non_donor_page - 1, contrib_page=contrib_page, expense_page=expense_page, category=selected_category, search=search_query) }}">Previous</a>
+                    </li>
+                    {% for p in range(1, total_non_donor_pages + 1) %}
+                    <li class="page-item {% if p == non_donor_page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', non_donor_page=p, contrib_page=contrib_page, expense_page=expense_page, category=selected_category, search=search_query) }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item {% if non_donor_page >= total_non_donor_pages %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('dashboard', non_donor_page=non_donor_page + 1, contrib_page=contrib_page, expense_page=expense_page, category=selected_category, search=search_query) }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
     </div>
 
     <!-- Modals -->
@@ -595,23 +673,77 @@
             </div>
         </div>
         {% endfor %}
+
+        {% for nd in non_donors %}
+        <div class="modal fade" id="editNonDonorModal{{ nd.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg">
+                    <form method="POST" action="/edit_non_donor/{{ nd.id }}">
+                        <div class="modal-header bg-secondary text-white">
+                            <h4 class="modal-title fw-bold">नाम संपादित करें (Edit Non-Donor)</h4>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold fs-5">व्यक्ति / परिवार का नाम (Name)</label>
+                                <input type="text" class="form-control form-control-lg" name="name" value="{{ nd.name }}" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
+                            <button type="submit" class="btn btn-primary fw-bold px-4">अपडेट करें</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteNonDonorModal{{ nd.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg border-danger border-3">
+                    <div class="modal-header bg-danger text-white">
+                        <h4 class="modal-title fw-bold"><i class="fa fa-exclamation-triangle"></i> रिकॉर्ड डिलीट करने की पुष्टि</h4>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body fs-5">
+                        <p class="fw-bold text-danger">क्या आप वाकई इस रिकॉर्ड को हमेशा के लिए हटाना चाहते हैं?</p>
+                        <div class="p-3 bg-light border rounded mb-3">
+                            <strong>नाम:</strong> {{ nd.name }}
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmDeleteND{{ nd.id }}" required onchange="document.getElementById('finalDeleteNDBtn{{ nd.id }}').disabled = !this.checked;">
+                            <label class="form-check-label fw-bold fs-6 text-dark" for="confirmDeleteND{{ nd.id }}">
+                                हाँ, मैं इसे डिलीट करने के लिए पूरी तरह आश्वस्त हूँ।
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
+                        <form method="POST" action="/delete_non_donor/{{ nd.id }}" class="d-inline">
+                            <button type="submit" id="finalDeleteNDBtn{{ nd.id }}" class="btn btn-danger fw-bold px-4" disabled>हाँ, डिलीट करें</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
         
         <div class="modal fade" id="contribModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow-lg">
                     <form method="POST" action="/add_contribution">
                         <div class="modal-header bg-warning text-dark">
-                            <h4 class="modal-title fw-bold">चंदा देने वाला व्यक्ति जोड़ें</h4>
+                            <h4 class="modal-title fw-bold">चंदा देने वाला या नहीं देने वाला व्यक्ति जोड़ें</h4>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
-                                <label class="form-label fw-bold fs-5">दाता का नाम (Donor Name)</label>
-                                <input type="text" class="form-control form-control-lg" name="name" required>
+                                <label class="form-label fw-bold fs-5">नाम (Name / Donor or Non-Donor)</label>
+                                <input type="text" class="form-control form-control-lg" name="name" required placeholder="व्यक्ति या परिवार का नाम दर्ज करें">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-bold fs-5">राशि (Amount in ₹)</label>
-                                <input type="number" step="any" class="form-control form-control-lg" name="amount" required>
+                                <label class="form-label fw-bold fs-5">राशि (Amount in ₹) <span class="text-muted fs-6">(चंदा नहीं दिया हो तो खाली छोड़ दें या 0 लिखें)</span></label>
+                                <input type="number" step="any" class="form-control form-control-lg" name="amount" placeholder="यदि चंदा दिया है तो राशि लिखें">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -682,6 +814,21 @@
             const input = document.getElementById("donorSearchInput");
             const filter = input.value.toLowerCase();
             const rows = document.getElementsByClassName("donor-row");
+
+            Array.from(rows).forEach(row => {
+                const name = row.getAttribute("data-name");
+                if (name.includes(filter)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        function filterNonDonorsTable() {
+            const input = document.getElementById("nonDonorSearchInput");
+            const filter = input.value.toLowerCase();
+            const rows = document.getElementsByClassName("non-donor-row");
 
             Array.from(rows).forEach(row => {
                 const name = row.getAttribute("data-name");
