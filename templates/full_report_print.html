@@ -49,7 +49,7 @@
         <p>बजट उपयोग: <span class="fw-bold text-info">{{ utilization_ratio }}%</span></p>
     </div>
 
-    <h3>चंदा विवरण</h3>
+    <h3>चंदा विवरण (Community Contributions)</h3>
     <table class="table table-bordered align-middle fs-4">
         <thead class="table-success text-dark">
             <tr>
@@ -71,7 +71,27 @@
         </tbody>
     </table>
 
-    <h3>खर्च विवरण</h3>
+    <h3>चंदा नहीं देने वाले (Non-Donors List)</h3>
+    <table class="table table-bordered align-middle fs-4">
+        <thead class="table-warning text-dark">
+            <tr>
+                <th style="width: 10%;">#</th>
+                <th style="width: 65%;">व्यक्ति / परिवार का नाम</th>
+                <th style="width: 25%;">तारीख</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for nd in non_donors %}
+            <tr>
+                <td class="fw-bold">{{ loop.index }}</td>
+                <td>{{ nd.name }}</td>
+                <td class="text-muted">{{ nd.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>खर्च विवरण (Detailed Expenses Ledger)</h3>
     <table class="table table-bordered align-middle fs-4">
         <thead class="table-danger text-dark">
             <tr>
