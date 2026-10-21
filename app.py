@@ -54,6 +54,13 @@ def init_db():
             )
         ''')
         cursor.execute('''
+            CREATE TABLE IF NOT EXISTS non_donors (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS expenses (
                 id SERIAL PRIMARY KEY,
                 title TEXT NOT NULL,
@@ -119,6 +126,9 @@ def dashboard():
     contrib_page = int(request.args.get('contrib_page', 1))
     contrib_offset = (contrib_page - 1) * per_page
 
+    non_donor_page = int(request.args.get('non_donor_page', 1))
+    non_donor_offset = (non_donor_page - 1) * per_page
+
     expense_page = int(request.args.get('expense_page', 1))
     expense_offset = (expense_page - 1) * per_page
 
@@ -145,13 +155,20 @@ def dashboard():
     cursor.execute("SELECT COUNT(*) AS count FROM collections")
     total_collections_count = cursor.fetchone()['count']
     
+    cursor.execute("SELECT COUNT(*) AS count FROM non_donors")
+    total_non_donors_count = cursor.fetchone()['count']
+
     cursor.execute("SELECT COUNT(*) AS count FROM expenses")
     total_expenses_count = cursor.fetchone()['count']
 
     total_contrib_pages = (total_collections_count + per_page - 1) // per_page if total_collections_count > 0 else 1
+    total_non_donor_pages = (total_non_donors_count + per_page - 1) // per_page if total_non_donors_count > 0 else 1
 
     cursor.execute("SELECT * FROM collections ORDER BY id DESC LIMIT %s OFFSET %s", (per_page, contrib_offset))
     contributions = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM non_donors ORDER BY id DESC LIMIT %s OFFSET %s", (per_page, non_donor_offset))
+    non_donors = cursor.fetchall()
 
     cursor.execute("SELECT * FROM uploads ORDER BY id DESC")
     uploads = cursor.fetchall()
@@ -164,14 +181,18 @@ def dashboard():
         utilization_ratio=utilization_ratio,
         expenses=expenses,
         contributions=contributions,
+        non_donors=non_donors,
         uploads=uploads,
         selected_category=category_filter,
         search_query=search_query,
         contrib_page=contrib_page,
         total_contrib_pages=total_contrib_pages,
+        non_donor_page=non_donor_page,
+        total_non_donor_pages=total_non_donor_pages,
         expense_page=expense_page,
         total_expense_pages=total_expense_pages,
         total_collections_count=total_collections_count,
+        total_non_donors_count=total_non_donors_count,
         total_expenses_count=total_expenses_count
     )
 
@@ -216,11 +237,18 @@ def add_contribution():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     name = request.form.get('name')
-    amount = float(request.form.get('amount', 0))
-    if name and amount > 0:
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute("INSERT INTO collections (name, amount) VALUES (%s, %s)", (name, amount))
+    amount_str = request.form.get('amount', '').strip()
+    
+    db = get_db()
+    cursor = db.cursor()
+
+    if name:
+        if not amount_str or float(amount_str) == 0:
+            # Agar amount nahi diya ya 0 dala hai, toh non_donors table mein jayega
+            cursor.execute("INSERT INTO non_donors (name) VALUES (%s)", (name,))
+        else:
+            amount = float(amount_str)
+            cursor.execute("INSERT INTO collections (name, amount) VALUES (%s, %s)", (name, amount))
         db.commit()
     return redirect(url_for('dashboard'))
 
@@ -249,6 +277,17 @@ def edit_contribution(id):
     db = get_db()
     cursor = db.cursor()
     cursor.execute("UPDATE collections SET name = %s, amount = %s WHERE id = %s", (name, amount, id))
+    db.commit()
+    return redirect(url_for('dashboard'))
+
+@app.route('/edit_non_donor/<int:id>', methods=['POST'])
+def edit_non_donor(id):
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    name = request.form.get('name')
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("UPDATE non_donors SET name = %s WHERE id = %s", (name, id))
     db.commit()
     return redirect(url_for('dashboard'))
 
@@ -287,6 +326,16 @@ def delete_contribution(id):
     db.commit()
     return redirect(url_for('dashboard'))
 
+@app.route('/delete_non_donor/<int:id>', methods=['POST'])
+def delete_non_donor(id):
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM non_donors WHERE id = %s", (id,))
+    db.commit()
+    return redirect(url_for('dashboard'))
+
 @app.route('/download_contribution_report')
 def download_contribution_report():
     db = get_db()
@@ -313,6 +362,8 @@ def download_full_report():
     cursor = db.cursor()
     cursor.execute("SELECT * FROM collections ORDER BY id DESC")
     contributions = cursor.fetchall()
+    cursor.execute("SELECT * FROM non_donors ORDER BY id DESC")
+    non_donors = cursor.fetchall()
     cursor.execute("SELECT COALESCE(SUM(amount), 0) AS coalesce FROM collections")
     total_collection = cursor.fetchone()['coalesce']
     cursor.execute("SELECT * FROM expenses ORDER BY id DESC")
@@ -323,6 +374,7 @@ def download_full_report():
     utilization_ratio = round((total_expenses / total_collection) * 100, 1) if total_collection > 0 else 0.0
     return render_template('full_report_print.html', 
                            contributions=contributions, 
+                           non_donors=non_donors,
                            expenses=expenses, 
                            total_collection=total_collection, 
                            total_expenses=total_expenses, 
