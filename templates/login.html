@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>लॉग इन - पचमो दुर्गा पूजा पोर्टल</title>
+    <title>लॉग इन - पूजा एवं उत्सव पोर्टल</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -63,22 +63,54 @@
             box-shadow: 0 8px 20px rgba(255, 193, 7, 0.6);
         }
         h2 {
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             font-weight: bold;
             color: #ffc107;
             text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
             font-size: 2.2rem;
+        }
+        .selected-info {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            color: #ffeb3b;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="login-card">
         <h2>कम्युनिटी लॉग इन</h2>
-        <form method="POST" action="/login">
+        
+        <!-- URL से पूजा और साल को कैप्चर करके दिखाने और आगे पास करने के लिए -->
+        <div id="selectedInfoDiv" class="selected-info">
+            चयनित: <span id="displayPuja">दुर्गा पूजा</span> (<span id="displayYear">2026</span>)
+        </div>
+
+        <form method="POST" action="/login" id="loginForm">
+            <!-- हिडन फील्ड्स ताकि लॉगिन के समय पूजा और साल सर्वर तक पहुँच जाए -->
+            <input type="hidden" name="puja_name" id="hiddenPuja" value="दुर्गा पूजा">
+            <input type="hidden" name="year" id="hiddenYear" value="2026">
+
             <input type="text" class="form-control" name="username" placeholder="यूजरनेम" required>
             <input type="password" class="form-control" name="password" placeholder="पासवर्ड" required>
             <button type="submit" class="btn btn-login">लॉग इन करें</button>
         </form>
     </div>
+
+    <script>
+        // URL से puja और year पैरामीटर पढ़कर फॉर्म में सेट करना
+        const urlParams = new URLSearchParams(window.location.search);
+        const puja = urlParams.get('puja') || 'दुर्गा पूजा';
+        const year = urlParams.get('year') || '2026';
+
+        document.getElementById('displayPuja').innerText = puja;
+        document.getElementById('displayYear').innerText = year;
+
+        document.getElementById('hiddenPuja').value = puja;
+        document.getElementById('hiddenYear').value = year;
+    </script>
 </body>
 </html>
