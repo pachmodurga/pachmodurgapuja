@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PACHMO DURGA PUJA FUND & EXPENSE PORTAL 2026</title>
+    <title>PACHMO {{ puja_name | upper }} FUND & EXPENSE PORTAL <span id="currentYearTitle">{{ year }}</span></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -44,6 +44,46 @@
             gap: 10px;
             align-items: flex-end;
         }
+        .portal-lock-container {
+            position: absolute;
+            top: 20px;
+            left: 25px;
+            z-index: 1000;
+        }
+        .lock-btn {
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 3px solid rgba(255,255,255,0.4);
+        }
+        .lock-btn.locked {
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+            color: white;
+            animation: pulse-red 2s infinite;
+        }
+        .lock-btn.unlocked {
+            background: linear-gradient(45deg, #2e7d32, #4caf50);
+            color: white;
+        }
+        .lock-btn:hover {
+            transform: scale(1.08) rotate(1deg);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+            cursor: pointer;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(244, 67, 54, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+        }
+
         .action-btn {
             background-color: rgba(255, 235, 59, 0.2);
             color: #fff;
@@ -100,48 +140,225 @@
             border-color: #581845;
             color: #fff;
         }
+        
+        .mega-colorful-select {
+            font-size: 1.6rem !important;
+            padding: 18px !important;
+            font-weight: bold !important;
+            border-radius: 15px !important;
+            border: 4px solid #ff9800 !important;
+            background: linear-gradient(135deg, #ffffff, #fffdf7) !important;
+            color: #3e0a29 !important;
+            box-shadow: 0 8px 20px rgba(255,152,0,0.35) !important;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d32f2f'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 20px center !important;
+            background-size: 28px !important;
+        }
+        .mega-colorful-select:focus {
+            border-color: #e91e63 !important;
+            box-shadow: 0 0 15px rgba(233,30,99,0.5) !important;
+            background: #ffffff !important;
+            outline: none;
+        }
+        .mega-colorful-select option {
+            font-size: 1.4rem !important;
+            font-weight: bold !important;
+            padding: 12px;
+            background: #fff;
+            color: #222;
+        }
+
+        body.is-portal-locked .disable-on-lock {
+            pointer-events: none;
+            opacity: 0.6;
+            filter: grayscale(0.5);
+        }
+        .compact-lock-banner {
+            background: linear-gradient(135deg, #2d132c, #801336);
+            border-left: 8px solid #ff0055;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 750px;
+            animation: border-dance 4s infinite linear;
+        }
+        @keyframes border-dance {
+            0% { border-color: #ff0055; }
+            33% { border-color: #ffcc00; }
+            66% { border-color: #00ffcc; }
+            100% { border-color: #ff0055; }
+        }
+        .banner-icon {
+            font-size: 2.2rem;
+            display: inline-block;
+            animation: lock-shake 2s infinite ease-in-out;
+        }
+        @keyframes lock-shake {
+            0%, 100% { transform: rotate(0deg); }
+            20% { transform: rotate(-15deg); }
+            40% { transform: rotate(15deg); }
+            60% { transform: rotate(-10deg); }
+            80% { transform: rotate(10deg); }
+        }
+        .banner-text-shadow {
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+        }
+
+        /* निश्चित चौड़ाई और स्पष्ट दृश्यता वाले 6-अंकों के लिए पिन इनपुट */
+        .six-digit-pin-input {
+            width: 100% !important;
+            max-width: 320px !important;
+            letter-spacing: 16px !important;
+            font-size: 2.5rem !important;
+            font-weight: 900 !important;
+            text-align: center !important;
+            padding: 15px 10px !important;
+            border: 4px solid #f57c00 !important;
+            border-radius: 15px !important;
+            background-color: #fff8e1 !important;
+            color: #000 !important;
+            box-shadow: inset 0 3px 8px rgba(0,0,0,0.2) !important;
+            margin: 20px auto !important;
+            display: block !important;
+        }
+        .six-digit-pin-input:focus {
+            border-color: #d32f2f !important;
+            box-shadow: 0 0 20px rgba(211,47,47,0.8), inset 0 3px 8px rgba(0,0,0,0.2) !important;
+            outline: none !important;
+        }
+        .six-digit-pin-input::placeholder {
+            letter-spacing: 10px !important;
+            font-size: 1.8rem !important;
+            opacity: 0.5 !important;
+            color: #555 !important;
+        }
     </style>
 </head>
-<body>
+<body class="{% if locked_state %}is-portal-locked{% endif %}">
+
+    {% if session.get('logged_in') %}
+    <div class="portal-lock-container">
+        <button type="button" id="mainLockBtn" class="lock-btn {% if locked_state %}locked{% else %}unlocked{% endif %}" onclick="openLockModal()">
+            {% if locked_state %}
+                <i class="fa fa-lock fa-bounce"></i> <span id="lockBtnText">पोर्टल लॉक है (Locked)</span>
+            {% else %}
+                <i class="fa fa-unlock-alt"></i> <span id="lockBtnText">पोर्टल खुला है (Unlocked)</span>
+            {% endif %}
+        </button>
+    </div>
+
+    <div class="modal fade" id="lockPinModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-warning border-4">
+                <div class="modal-header bg-dark text-white">
+                    <h4 class="modal-title fw-bold"><i class="fa fa-shield-halved text-warning"></i> सुरक्षा पिन सत्यापन (Security PIN)</h4>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div id="lockModalIconDisplay" class="mb-3" style="font-size: 3rem;"></div>
+                    <h5 id="lockModalActionTitle" class="fw-bold mb-3"></h5>
+                    <p class="text-white bg-dark p-2 rounded fw-bold fs-5">🔒 6-अंकों का गुप्त पिन दर्ज करें (6-Digit PIN: 822116)</p>
+                    <p class="text-muted mb-1">पोर्टल की स्थिति बदलने के लिए सही 6-अंकों का पिन डालें:</p>
+                    
+                    <input type="password" id="securityPinInput" class="six-digit-pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" placeholder="------">
+                    
+                    <button type="button" class="btn btn-warning btn-lg fw-bold px-5 shadow-lg w-100 fs-3" style="border-radius: 12px;" onclick="verifyPinAndToggleLock()">प्रमाणित करें (Verify Now)</button>
+                    <div id="pinErrorFeedback" class="text-danger fw-bold mt-3 fs-4 p-2 bg-light border border-danger rounded"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="header-section text-center">
         <div class="header-actions">
+            <a href="/" class="action-btn" style="background-color: rgba(255, 193, 7, 0.3); border-color: #ffc107;">
+                <i class="fa fa-home"></i> होम (Home)
+            </a>
             {% if session.get('logged_in') %}
                 <a href="/logout" class="action-btn">
                     <i class="fa fa-sign-out-alt"></i> लॉग आउट (Logout)
                 </a>
             {% else %}
-                <a href="/login" class="action-btn">
+                <a href="/login?puja={{ puja_name }}&year={{ year }}" class="action-btn">
                     <i class="fa fa-sign-in-alt"></i> एडमिन लॉग इन (Login)
                 </a>
             {% endif %}
-            <a href="/download_full_report" class="action-btn full-report-btn" target="_blank">
+            <a href="/download_full_report?puja={{ puja_name }}&year={{ year }}" class="action-btn full-report-btn" target="_blank">
                 <i class="fa fa-file-pdf"></i> पूरी रिपोर्ट (Full Report)
             </a>
         </div>
 
         <div class="container-fluid px-3">
-            <span class="badge bg-warning text-dark px-4 py-2 mb-3 fw-bold shadow-lg" style="font-size: 1.1rem; border: 2px solid #fff; border-radius: 20px;">✨ LIVE PUBLIC AUDITED LEDGER 2026 ✨</span>
-            <h1 class="text-uppercase portal-main-title mb-1">PACHMO DURGA PUJA FUND & EXPENSE PORTAL 2026</h1>
-            <h2 class="portal-sub-title mt-2 mb-2">( पचमो दुर्गा पूजा फंड और खर्च पोर्टल 2026 )</h2>
-            <p class="text-light mt-2 mb-1 fs-5">Sharadotsav 1432 / 2026 • <span class="badge bg-success fs-6">Real-Time Verified</span></p>
-            <h3 class="text-info mt-2 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.9); font-size: 1.5rem;">नवशक्ति यूवा दुर्गा पूजा समिति  2026</h3>
+            <span class="badge bg-warning text-dark px-4 py-2 mb-3 fw-bold shadow-lg" style="font-size: 1.1rem; border: 2px solid #fff; border-radius: 20px;">✨ LIVE PUBLIC AUDITED LEDGER {{ year }} ✨</span>
+            
+            <h1 class="text-uppercase portal-main-title mb-1">PACHMO {{ puja_name | upper }} FUND & EXPENSE PORTAL {{ year }}</h1>
+            
+            <h2 class="portal-sub-title mt-2 mb-2">( पचमो {{ puja_name }} फंड और खर्च पोर्टल {{ year }} )</h2>
+            
+            <p class="text-light mt-2 mb-1 fs-5">Sharadotsav • <span class="badge bg-success fs-6">Real-Time Verified (IST)</span></p>
+            <h3 class="text-info mt-2 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.9); font-size: 1.5rem;">नवशक्ति यूवा {{ puja_name }} समिति {{ year }}</h3>
             
             {% if session.get('logged_in') %}
-                <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
-                    <button class="btn btn-warning btn-lg fw-bold text-dark px-4 py-2.5 shadow" data-bs-toggle="modal" data-bs-target="#contribModal" style="font-size: 1.1rem;">
-                        <i class="fa fa-plus-circle"></i> चंदा देने वाला व्यक्ति जोड़ें
-                    </button>
-                    <button class="btn btn-danger btn-lg fw-bold text-white px-4 py-2.5 shadow" data-bs-toggle="modal" data-bs-target="#expenseModal" style="font-size: 1.1rem;">
-                        <i class="fa fa-plus-circle"></i> खर्च जोड़ें (Add Expense)
-                    </button>
+            <div id="lockWarningBanner" class="alert alert-danger alert-dismissible fade {% if locked_state %}show{% else %}d-none{% endif %} mt-4 mx-auto p-3 shadow-lg compact-lock-banner text-white text-start" role="alert">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="banner-icon">
+                        <i class="fa-solid fa-lock-open text-warning" title="Unlock Needed"></i>
+                        <i class="fa-solid fa-triangle-exclamation text-danger ms-n3" title="Warning"></i>
+                    </div>
+                    <div>
+                        <h4 class="alert-heading fw-bold mb-1 text-warning banner-text-shadow">
+                            <i class="fa-solid fa-ban text-danger"></i> सत्र लॉक है (Portal Locked)!
+                        </h4>
+                        <p class="mb-0 text-light" style="font-size: 0.95rem; line-height: 1.4;">
+                            <span class="badge bg-danger text-white">⚠️ सुरक्षा सक्रिय</span> कोई नया डेटा नहीं जुड़ सकता। पुराने रिकॉर्ड बदलने हेतु, सबसे पहले ऊपर बाईं ओर दिए गए <strong>"पोर्टल लॉक है"</strong> लाल बटन पर क्लिक करें और 6-अंकों का पिन डालकर अनलॉक करें।
+                        </p>
+                    </div>
                 </div>
+            </div>
+            
+            <div class="disable-on-lock mt-4 d-flex justify-content-center gap-3 flex-wrap">
+                <button class="btn btn-warning btn-lg fw-bold text-dark px-4 py-2.5 shadow" data-bs-toggle="modal" data-bs-target="#contribModal" style="font-size: 1.1rem;">
+                    <i class="fa fa-plus-circle"></i> चंदा देने वाला व्यक्ति जोड़ें
+                </button>
+                <button class="btn btn-danger btn-lg fw-bold text-white px-4 py-2.5 shadow" data-bs-toggle="modal" data-bs-target="#expenseModal" style="font-size: 1.1rem;">
+                    <i class="fa fa-plus-circle"></i> खर्च जोड़ें (Add Expense)
+                </button>
+            </div>
             {% endif %}
         </div>
     </div>
 
     <div class="container-fluid px-4 my-4">
         
+        <div class="card card-custom p-4 bg-white mb-4 border-warning border-3">
+            <h4 class="fw-bold mb-3 text-dark">पूजा और सत्र का चयन करें</h4>
+            <form method="GET" action="/dashboard" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold fs-5">पूजा का चयन करें (Select Puja):</label>
+                    <select name="puja" class="form-select mega-colorful-select" required>
+                        <option value="दुर्गा पूजा" {% if puja_name == 'दुर्गा पूजा' %}selected{% endif %}>दुर्गा पूजा (Durga Puja)</option>
+                        <option value="सरस्वती पूजा" {% if puja_name == 'सरस्वती पूजा' %}selected{% endif %}>सरस्वती पूजा (Saraswati Puja)</option>
+                        <option value="लक्ष्मी पूजा" {% if puja_name == 'लक्ष्मी पूजा' %}selected{% endif %}>लक्ष्मी पूजा (Laxmi Puja)</option>
+                        <option value="छठ पूजा" {% if puja_name == 'छठ पूजा' %}selected{% endif %}>छठ पूजा (Chhath Puja)</option>
+                        <option value="जन्माष्टमी" {% if puja_name == 'जन्माष्टमी' %}selected{% endif %}>जन्माष्टमी (Janmashtami)</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold fs-5">वर्ष का चयन करें (Select Year):</label>
+                    <select name="year" id="yearSelectDropdown" class="form-select mega-colorful-select" required>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold shadow border-0" style="padding: 18px; font-size: 1.4rem; background: linear-gradient(135deg, #ffc107, #ff9800); color: #000;">
+                        <i class="fa fa-eye"></i> प्रीव्यू / लोड करें (Preview / Load)
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <div class="row g-4 mb-4">
             <div class="col-xl-4 col-md-4">
                 <div class="card card-custom p-4 bg-white border-start border-success border-4">
@@ -181,7 +398,6 @@
             </div>
         </div>
 
-        <!-- रजिस्टर मेंटेन फाइल -->
         <div class="card card-custom p-4 bg-white mb-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                 <div>
@@ -189,7 +405,9 @@
                     <p class="text-muted mb-0 fs-5 mt-1">हस्ताक्षरित रिकॉर्ड और रजिस्टर स्कैन प्रतियाँ (PDF/Images)</p>
                 </div>
                 {% if session.get('logged_in') %}
-                    <form method="POST" action="/upload" enctype="multipart/form-data" class="d-flex gap-2">
+                    <form method="POST" action="/upload" enctype="multipart/form-data" class="disable-on-lock d-flex gap-2">
+                        <input type="hidden" name="puja_name" value="{{ puja_name }}">
+                        <input type="hidden" name="year" value="{{ year }}">
                         <input type="file" name="file" class="form-control form-control-lg" required>
                         <button type="submit" class="btn btn-success btn-lg fw-bold px-4"><i class="fa fa-upload"></i> अपलोड करें</button>
                     </form>
@@ -222,7 +440,7 @@
                                         <i class="fa fa-eye"></i> देखें
                                     </a>
                                     {% if session.get('logged_in') %}
-                                        <button type="button" class="btn btn-danger fw-bold px-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteUploadModal{{ upload.id }}" title="Delete File">
+                                        <button type="button" class="disable-on-lock btn btn-danger fw-bold px-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteUploadModal{{ upload.id }}" title="Delete File">
                                             <i class="fa fa-trash"></i> डिलीट
                                         </button>
                                     {% endif %}
@@ -239,7 +457,6 @@
             </div>
         </div>
 
-        <!-- खर्चों की टेबल (Detailed Expenses Ledger) -->
         <div class="card card-custom p-4 bg-white mb-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                 <div>
@@ -254,10 +471,12 @@
                 </div>
                 
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="/download_expense_report" class="btn btn-outline-danger btn-lg fw-bold" target="_blank" title="Download Expense Report PDF">
+                    <a href="/download_expense_report?puja={{ puja_name }}&year={{ year }}" class="btn btn-outline-danger btn-lg fw-bold" target="_blank" title="Download Expense Report PDF">
                         <i class="fa fa-file-pdf"></i> खर्च रिपोर्ट (PDF)
                     </a>
                     <form method="GET" action="/dashboard" class="d-flex" style="max-width: 320px; width: 100%;">
+                        <input type="hidden" name="puja" value="{{ puja_name }}">
+                        <input type="hidden" name="year" value="{{ year }}">
                         <input type="hidden" name="category" value="{{ selected_category }}">
                         <input type="text" name="search" class="form-control form-control-lg" placeholder="Search item, vendor..." value="{{ search_query }}">
                         <button type="submit" class="btn btn-outline-primary ms-2 px-3"><i class="fa fa-search"></i></button>
@@ -266,14 +485,14 @@
             </div>
 
             <div class="d-flex flex-wrap gap-2 mb-4">
-                <a href="/dashboard?category=All Categories{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'All Categories' %}active{% endif %}">All Categories (सभी श्रेणियां)</a>
-                <a href="/dashboard?category=Idol & Pratima{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Idol & Pratima' %}active{% endif %}">Idol & Pratima (मूर्ति एवं प्रतिमा)</a>
-                <a href="/dashboard?category=Pandal & Decor{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Pandal & Decor' %}active{% endif %}">Pandal & Decor (पंडाल एवं सजावट)</a>
-                <a href="/dashboard?category=Lighting & Sound{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Lighting & Sound' %}active{% endif %}">Lighting & Sound (लाइटिंग एवं साउंड)</a>
-                <a href="/dashboard?category=Bhog & Prasad{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Bhog & Prasad' %}active{% endif %}">Bhog & Prasad (भोग एवं प्रसाद)</a>
-                <a href="/dashboard?category=Artists & Dhaki{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Artists & Dhaki' %}active{% endif %}">Artists & Dhaki (कलाकार एवं ढाकी)</a>
-                <a href="/dashboard?category=Logistics & Misc{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Logistics & Misc' %}active{% endif %}">Logistics & Misc (लॉजिस्टिक्स एवं अन्य)</a>
-                <a href="/dashboard?category=Other{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Other' %}active{% endif %}">Other (अन्य)</a>
+                <a href="/dashboard?puja={{ puja_name }}&year={{ year }}&category=All Categories{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'All Categories' %}active{% endif %}">All Categories (सभी श्रेणियां)</a>
+                <a href="/dashboard?puja={{ puja_name }}&year={{ year }}&category=Idol & Pratima{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Idol & Pratima' %}active{% endif %}">Idol & Pratima (मूर्ति एवं प्रतिमा)</a>
+                <a href="/dashboard?puja={{ puja_name }}&year={{ year }}&category=Pandal & Decor{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Pandal & Decor' %}active{% endif %}">Pandal & Decor (पंडाल एवं सजावट)</a>
+                <a href="/dashboard?puja={{ puja_name }}&year={{ year }}&category=Lighting & Sound{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Lighting & Sound' %}active{% endif %}">Lighting & Sound (लाइटिंग एवं साउंड)</a>
+                <a href="/dashboard?puja={{ puja_name }}&year={{ year }}&category=Bhog & Prasad{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Bhog & Prasad' %}active{% endif %}">Bhog & Prasad (भोग एवं प्रसाद)</a>
+                <a href="/dashboard?puja={{ puja_name }}&year={{ year }}&category=Artists & Dhaki{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Artists & Dhaki' %}active{% endif %}">Artists & Dhaki (कलाकार एवं ढाकी)</a>
+                <a href="/dashboard?puja={{ puja_name }}&year={{ year }}&category=Logistics & Misc{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Logistics & Misc' %}active{% endif %}">Logistics & Misc (लॉजिस्टिक्स एवं अन्य)</a>
+                <a href="/dashboard?puja={{ puja_name }}&year={{ year }}&category=Other{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-outline-secondary category-badge {% if selected_category == 'Other' %}active{% endif %}">Other (अन्य)</a>
             </div>
 
             <div class="table-responsive">
@@ -303,10 +522,10 @@
                             {% if session.get('logged_in') %}
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-warning fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editExpenseModal{{ exp.id }}" title="Edit">
+                                        <button type="button" class="disable-on-lock btn btn-warning fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editExpenseModal{{ exp.id }}" title="Edit">
                                             <i class="fa fa-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteExpenseModal{{ exp.id }}" title="Delete">
+                                        <button type="button" class="disable-on-lock btn btn-danger fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteExpenseModal{{ exp.id }}" title="Delete">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>
@@ -322,25 +541,23 @@
                 </table>
             </div>
 
-            <!-- खर्चों के लिए पैजिनेशन -->
             <nav aria-label="Expense Page Navigation" class="mt-4">
                 <ul class="pagination justify-content-center">
                     <li class="page-item {% if expense_page <= 1 %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', expense_page=expense_page - 1, contrib_page=contrib_page, category=selected_category, search=search_query) }}">Previous</a>
+                        <a class="page-link" href="{{ url_for('dashboard', expense_page=expense_page - 1, contrib_page=contrib_page, puja=puja_name, year=year, category=selected_category, search=search_query) }}">Previous</a>
                     </li>
                     {% for p in range(1, total_expense_pages + 1) %}
                     <li class="page-item {% if p == expense_page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', expense_page=p, contrib_page=contrib_page, category=selected_category, search=search_query) }}">{{ p }}</a>
+                        <a class="page-link" href="{{ url_for('dashboard', expense_page=p, contrib_page=contrib_page, puja=puja_name, year=year, category=selected_category, search=search_query) }}">{{ p }}</a>
                     </li>
                     {% endfor %}
                     <li class="page-item {% if expense_page >= total_expense_pages %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', expense_page=expense_page + 1, contrib_page=contrib_page, category=selected_category, search=search_query) }}">Next</a>
+                        <a class="page-link" href="{{ url_for('dashboard', expense_page=expense_page + 1, contrib_page=contrib_page, puja=puja_name, year=year, category=selected_category, search=search_query) }}">Next</a>
                     </li>
                 </ul>
             </nav>
         </div>
 
-        <!-- समुदाय चंदा टेबल (Community Contributions) -->
         <div class="card card-custom p-4 bg-white mb-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                 <div>
@@ -351,11 +568,11 @@
                             <span class="badge bg-success fs-5 px-3 py-2">कुल चंदा: ₹ {{ total_collection }}</span>
                         </div>
                     </div>
-                    <p class="text-muted mb-0 fs-5 mt-1">चंदा विवरण - Heartfelt gratitude to every family supporting Maa Durga.</p>
+                    <p class="text-muted mb-0 fs-5 mt-1">चंदा विवरण - Heartfelt gratitude to every family supporting the festival.</p>
                 </div>
 
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="/download_contribution_report" class="btn btn-outline-success btn-lg fw-bold" target="_blank" title="Download Contribution Report PDF">
+                    <a href="/download_contribution_report?puja={{ puja_name }}&year={{ year }}" class="btn btn-outline-success btn-lg fw-bold" target="_blank" title="Download Contribution Report PDF">
                         <i class="fa fa-file-pdf"></i> चंदा रिपोर्ट (PDF)
                     </a>
                     <div class="d-flex" style="max-width: 280px; width: 100%;">
@@ -389,10 +606,10 @@
                             {% if session.get('logged_in') %}
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-primary fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editContribModal{{ c.id }}" title="Edit">
+                                        <button type="button" class="disable-on-lock btn btn-primary fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editContribModal{{ c.id }}" title="Edit">
                                             <i class="fa fa-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteContribModal{{ c.id }}" title="Delete">
+                                        <button type="button" class="disable-on-lock btn btn-danger fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteContribModal{{ c.id }}" title="Delete">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>
@@ -408,25 +625,23 @@
                 </table>
             </div>
 
-            <!-- चंदा के लिए पैजिनेशन -->
             <nav aria-label="Donors Page Navigation" class="mt-4">
                 <ul class="pagination justify-content-center">
                     <li class="page-item {% if contrib_page <= 1 %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', contrib_page=contrib_page - 1, expense_page=expense_page, category=selected_category, search=search_query) }}">Previous</a>
+                        <a class="page-link" href="{{ url_for('dashboard', contrib_page=contrib_page - 1, expense_page=expense_page, puja=puja_name, year=year, category=selected_category, search=search_query) }}">Previous</a>
                     </li>
                     {% for p in range(1, total_contrib_pages + 1) %}
                     <li class="page-item {% if p == contrib_page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', contrib_page=p, expense_page=expense_page, category=selected_category, search=search_query) }}">{{ p }}</a>
+                        <a class="page-link" href="{{ url_for('dashboard', contrib_page=p, expense_page=expense_page, puja=puja_name, year=year, category=selected_category, search=search_query) }}">{{ p }}</a>
                     </li>
                     {% endfor %}
                     <li class="page-item {% if contrib_page >= total_contrib_pages %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', contrib_page=contrib_page + 1, expense_page=expense_page, category=selected_category, search=search_query) }}">Next</a>
+                        <a class="page-link" href="{{ url_for('dashboard', contrib_page=contrib_page + 1, expense_page=expense_page, puja=puja_name, year=year, category=selected_category, search=search_query) }}">Next</a>
                     </li>
                 </ul>
             </nav>
         </div>
 
-        <!-- चंदा नहीं देने वाले की टेबल (Non-Donors List) -->
         <div class="card card-custom p-4 bg-white mb-4 border-top border-warning border-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                 <div>
@@ -436,7 +651,7 @@
                             <span class="badge bg-danger fs-5 px-3 py-2">कुल संख्या: {{ total_non_donors_count }} व्यक्ति</span>
                         </div>
                     </div>
-                    👉😒😒">जिन परिवारों/व्यक्तियों द्वारा चंदा नहीं दिया गया है उनका विवरण</p>
+                    <p class="text-muted mb-0 fs-5 mt-1">जिन परिवारों/व्यक्तियों द्वारा चंदा नहीं दिया गया है उनका विवरण</p>
                 </div>
 
                 <div class="d-flex gap-2 flex-wrap">
@@ -467,10 +682,10 @@
                             {% if session.get('logged_in') %}
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-primary fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editNonDonorModal{{ nd.id }}" title="Edit">
+                                        <button type="button" class="disable-on-lock btn btn-primary fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editNonDonorModal{{ nd.id }}" title="Edit">
                                             <i class="fa fa-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteNonDonorModal{{ nd.id }}" title="Delete">
+                                        <button type="button" class="disable-on-lock btn btn-danger fw-bold px-2 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteNonDonorModal{{ nd.id }}" title="Delete">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>
@@ -486,19 +701,18 @@
                 </table>
             </div>
 
-            <!-- नॉन-डोनर्स के लिए पैजिनेशन -->
             <nav aria-label="Non-Donor Page Navigation" class="mt-4">
                 <ul class="pagination justify-content-center">
                     <li class="page-item {% if non_donor_page <= 1 %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', non_donor_page=non_donor_page - 1, contrib_page=contrib_page, expense_page=expense_page, category=selected_category, search=search_query) }}">Previous</a>
+                        <a class="page-link" href="{{ url_for('dashboard', non_donor_page=non_donor_page - 1, contrib_page=contrib_page, expense_page=expense_page, puja=puja_name, year=year, category=selected_category, search=search_query) }}">Previous</a>
                     </li>
                     {% for p in range(1, total_non_donor_pages + 1) %}
                     <li class="page-item {% if p == non_donor_page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', non_donor_page=p, contrib_page=contrib_page, expense_page=expense_page, category=selected_category, search=search_query) }}">{{ p }}</a>
+                        <a class="page-link" href="{{ url_for('dashboard', non_donor_page=p, contrib_page=contrib_page, expense_page=expense_page, puja=puja_name, year=year, category=selected_category, search=search_query) }}">{{ p }}</a>
                     </li>
                     {% endfor %}
                     <li class="page-item {% if non_donor_page >= total_non_donor_pages %}disabled{% endif %}">
-                        <a class="page-link" href="{{ url_for('dashboard', non_donor_page=non_donor_page + 1, contrib_page=contrib_page, expense_page=expense_page, category=selected_category, search=search_query) }}">Next</a>
+                        <a class="page-link" href="{{ url_for('dashboard', non_donor_page=non_donor_page + 1, contrib_page=contrib_page, expense_page=expense_page, puja=puja_name, year=year, category=selected_category, search=search_query) }}">Next</a>
                     </li>
                 </ul>
             </nav>
@@ -506,7 +720,6 @@
 
     </div>
 
-    <!-- Modals -->
     {% if session.get('logged_in') %}
         {% for upload in uploads %}
         <div class="modal fade" id="deleteUploadModal{{ upload.id }}" tabindex="-1" aria-hidden="true">
@@ -532,6 +745,8 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
                         <form method="POST" action="/delete_upload/{{ upload.id }}" class="d-inline">
+                            <input type="hidden" name="puja_name" value="{{ puja_name }}">
+                            <input type="hidden" name="year" value="{{ year }}">
                             <button type="submit" id="finalDeleteUploadBtn{{ upload.id }}" class="btn btn-danger fw-bold px-4" disabled>हाँ, डिलीट करें</button>
                         </form>
                     </div>
@@ -545,6 +760,8 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow-lg">
                     <form method="POST" action="/edit_expense/{{ exp.id }}">
+                        <input type="hidden" name="puja_name" value="{{ puja_name }}">
+                        <input type="hidden" name="year" value="{{ year }}">
                         <div class="modal-header bg-warning text-dark">
                             <h4 class="modal-title fw-bold">खर्च संपादित करें (Edit Expense)</h4>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -556,7 +773,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold fs-5">श्रेणी (Category)</label>
-                                <select class="form-select form-select-lg" name="category">
+                                <select class="form-select form-select-lg mega-colorful-select" name="category">
                                     <option value="Idol & Pratima" {% if exp.category == 'Idol & Pratima' %}selected{% endif %}>Idol & Pratima (मूर्ति एवं प्रतिमा)</option>
                                     <option value="Pandal & Decor" {% if exp.category == 'Pandal & Decor' %}selected{% endif %}>Pandal & Decor (पंडाल एवं सजावट)</option>
                                     <option value="Lighting & Sound" {% if exp.category == 'Lighting & Sound' %}selected{% endif %}>Lighting & Sound (लाइटिंग एवं साउंड)</option>
@@ -607,6 +824,8 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
                         <form method="POST" action="/delete_expense/{{ exp.id }}" class="d-inline">
+                            <input type="hidden" name="puja_name" value="{{ puja_name }}">
+                            <input type="hidden" name="year" value="{{ year }}">
                             <button type="submit" id="finalDeleteExpBtn{{ exp.id }}" class="btn btn-danger fw-bold px-4" disabled>हाँ, डिलीट करें</button>
                         </form>
                     </div>
@@ -620,6 +839,8 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow-lg">
                     <form method="POST" action="/edit_contribution/{{ c.id }}">
+                        <input type="hidden" name="puja_name" value="{{ puja_name }}">
+                        <input type="hidden" name="year" value="{{ year }}">
                         <div class="modal-header bg-primary text-white">
                             <h4 class="modal-title fw-bold">चंदा संपादित करें (Edit Contribution)</h4>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -666,6 +887,8 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
                         <form method="POST" action="/delete_contribution/{{ c.id }}" class="d-inline">
+                            <input type="hidden" name="puja_name" value="{{ puja_name }}">
+                            <input type="hidden" name="year" value="{{ year }}">
                             <button type="submit" id="finalDeleteContribBtn{{ c.id }}" class="btn btn-danger fw-bold px-4" disabled>हाँ, डिलीट करें</button>
                         </form>
                     </div>
@@ -679,6 +902,8 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow-lg">
                     <form method="POST" action="/edit_non_donor/{{ nd.id }}">
+                        <input type="hidden" name="puja_name" value="{{ puja_name }}">
+                        <input type="hidden" name="year" value="{{ year }}">
                         <div class="modal-header bg-secondary text-white">
                             <h4 class="modal-title fw-bold">नाम संपादित करें (Edit Non-Donor)</h4>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -720,6 +945,8 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">रद्द करें</button>
                         <form method="POST" action="/delete_non_donor/{{ nd.id }}" class="d-inline">
+                            <input type="hidden" name="puja_name" value="{{ puja_name }}">
+                            <input type="hidden" name="year" value="{{ year }}">
                             <button type="submit" id="finalDeleteNDBtn{{ nd.id }}" class="btn btn-danger fw-bold px-4" disabled>हाँ, डिलीट करें</button>
                         </form>
                     </div>
@@ -732,6 +959,8 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow-lg">
                     <form method="POST" action="/add_contribution">
+                        <input type="hidden" name="puja_name" value="{{ puja_name }}">
+                        <input type="hidden" name="year" value="{{ year }}">
                         <div class="modal-header bg-warning text-dark">
                             <h4 class="modal-title fw-bold">चंदा देने वाला या नहीं देने वाला व्यक्ति जोड़ें</h4>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -759,6 +988,8 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow-lg">
                     <form method="POST" action="/add_expense">
+                        <input type="hidden" name="puja_name" value="{{ puja_name }}">
+                        <input type="hidden" name="year" value="{{ year }}">
                         <div class="modal-header bg-danger text-white">
                             <h4 class="modal-title fw-bold">नया खर्च जोड़ें (Add Expense)</h4>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -770,7 +1001,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold fs-5">श्रेणी (Category)</label>
-                                <select class="form-select form-select-lg" name="category">
+                                <select class="form-select form-select-lg mega-colorful-select" name="category">
                                     <option value="Idol & Pratima">Idol & Pratima (मूर्ति एवं प्रतिमा)</option>
                                     <option value="Pandal & Decor">Pandal & Decor (पंडाल एवं सजावट)</option>
                                     <option value="Lighting & Sound">Lighting & Sound (लाइटिंग एवं साउंड)</option>
@@ -801,15 +1032,119 @@
 
    <footer class="text-center py-4 bg-dark text-white border-top mt-5">
         <div class="container-fluid">
-            <h5 class="mb-1 fw-bold">नबग्राम ग्राम सार्वजनिक दुर्गात्सव समिति 2026</h5>
-            <p class="mb-1 text-light fs-6">पूजा समिति द्वारा संचालित • सभी रिकॉर्ड ग्राम कोषागार द्वारा सत्यापित</p>
-            <p class="mb-0 fs-6 text-warning fw-bold">शारदोत्सव 1432 / 2026 • भक्त विश्वास और सामुदायिक सद्भाव के लिए सार्वजनिक वित्तीय लेखापरीक्षा</p>
+            <h5 class="mb-1 fw-bold">नबग्राम ग्राम सार्वजनिक {{ puja_name }} समिति <span id="currentYearFooter">{{ year }}</span></h5>
+            <p class="p-1 mb-1 text-light fs-6">पूजा समिति द्वारा संचालित • सभी रिकॉर्ड ग्राम कोषागार द्वारा सत्यापित</p>
+            <p class="mb-0 fs-6 text-warning fw-bold">शारदोत्सव • भक्त विश्वास और सामुदायिक सद्भाव के लिए सार्वजनिक वित्तीय लेखापरीक्षा</p>
             <p class="mt-2 mb-0 text-info fw-bold fs-5">Made by Ashok</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const currentPuja = "{{ puja_name }}";
+        const currentYear = "{{ year }}";
+        let targetLockAction = 'lock';
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectDropdown = document.getElementById("yearSelectDropdown");
+            const selectedYear = "{{ year }}";
+            
+            const currentISTYear = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
+            const currentYearVal = new Date(currentISTYear).getFullYear();
+            
+            const startYear = 2024;
+            const endYear = Math.max(currentYearVal + 2, parseInt(selectedYear) || currentYearVal);
+            
+            selectDropdown.innerHTML = "";
+            for (let y = endYear; y >= startYear; y--) {
+                let option = document.createElement("option");
+                option.value = y;
+                option.textContent = y;
+                if (y == selectedYear || (!selectedYear && y == currentYearVal)) {
+                    option.selected = true;
+                }
+                selectDropdown.appendChild(option);
+            }
+        });
+
+        function openLockModal() {
+            const mainBtn = document.getElementById("mainLockBtn");
+            const isCurrentlyLocked = mainBtn.classList.contains("locked");
+            
+            const iconDisplay = document.getElementById("lockModalIconDisplay");
+            const actionTitle = document.getElementById("lockModalActionTitle");
+            const errorDiv = document.getElementById("pinErrorFeedback");
+            errorDiv.textContent = "";
+            document.getElementById("securityPinInput").value = "";
+
+            if (isCurrentlyLocked) {
+                targetLockAction = 'unlock';
+                iconDisplay.innerHTML = '<i class="fa fa-unlock-alt text-success fa-fade"></i>';
+                actionTitle.innerHTML = '<span class="text-success">पोर्टल अनलॉक करें (Unlock Portal)</span>';
+            } else {
+                targetLockAction = 'lock';
+                iconDisplay.innerHTML = '<i class="fa fa-lock text-danger fa-shake"></i>';
+                actionTitle.innerHTML = '<span class="text-danger">पोर्टल लॉक करें (Lock Portal)</span>';
+            }
+            const lockModal = new bootstrap.Modal(document.getElementById("lockPinModal"));
+            lockModal.show();
+        }
+
+        function verifyPinAndToggleLock() {
+            const pinInput = document.getElementById("securityPinInput");
+            const pin = pinInput.value.trim();
+            const errorDiv = document.getElementById("pinErrorFeedback");
+            
+            if (pin.length !== 6 || !/^\d{6}$/.test(pin)) {
+                errorDiv.textContent = "⚠️ त्रुटि: कृपया ठीक 6 अंक (822116) दर्ज करें।";
+                return;
+            }
+
+            fetch('/toggle_lock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ puja_name: currentPuja, year: currentYear, pin: pin, action: targetLockAction })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const mainBtn = document.getElementById("mainLockBtn");
+                    const btnText = document.getElementById("lockBtnText");
+                    const bodyClass = document.body;
+                    const warningBanner = document.getElementById("lockWarningBanner");
+
+                    if (data.locked) {
+                        mainBtn.className = "lock-btn locked";
+                        btnText.innerHTML = "पोर्टल लॉक है (Locked)";
+                        mainBtn.querySelector("i").className = "fa fa-lock fa-bounce";
+                        bodyClass.classList.add("is-portal-locked");
+                        if (warningBanner) {
+                            warningBanner.classList.remove("d-none");
+                            warningBanner.classList.add("show");
+                        }
+                    } else {
+                        mainBtn.className = "lock-btn unlocked";
+                        btnText.innerHTML = "पोर्टल खुला है (Unlocked)";
+                        mainBtn.querySelector("i").className = "fa fa-unlock-alt";
+                        bodyClass.classList.remove("is-portal-locked");
+                        if (warningBanner) {
+                            warningBanner.classList.remove("show");
+                            warningBanner.classList.add("d-none");
+                        }
+                    }
+                    const modalEl = document.getElementById("lockPinModal");
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    modal.hide();
+                    alert(data.message);
+                } else {
+                    errorDiv.textContent = " " + data.message;
+                }
+            })
+            .catch(err => {
+                errorDiv.textContent = "❌ सर्वर त्रुटि। पुनः प्रयास करें।";
+            });
+        }
+
         function filterDonorsTable() {
             const input = document.getElementById("donorSearchInput");
             const filter = input.value.toLowerCase();
